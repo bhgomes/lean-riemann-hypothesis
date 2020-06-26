@@ -65,90 +65,144 @@ def supp {X Y : Type*} [has_zero Y] (f : X → Y)
 
 end analysis --——————————————————————————————————————————————————————————————————————————--
 
-section complex --———————————————————————————————————————————————————————————————————————--
+section difference_domain --—————————————————————————————————————————————————————————————--
+variables (C : Type*) [has_zero C] [has_sub C] [has_mul C]
 
 /--
 -/
-structure Complex (C : Type*) [has_zero C] [has_one C] [has_sub C] [has_mul C]
-    := (real            : C → C)
-       (int             : C → C)
-       (real_idempotent : Π z, real (real z) = real z)
-       (int_idempotent  : Π z, int (int z) = int z)
-       (abs             : C → membership real)
-       (int_is_real     : Π {z}, z ∈ int → z ∈ real)
-       (zero_is_int     : (0 : C) ∈ int)
-       (one_is_int      : (1 : C) ∈ int)
-       (real_lt         : membership real → membership real → Prop)
+structure DifferenceDomain
+    := (sub_cancel       : Π z : C, z - z = 0)
+       (sub_right_id     : Π z : C, z - 0 = z)
+       (mul_right_absorb : Π z : C, z * 0 = 0)
+
+end difference_domain --—————————————————————————————————————————————————————————————————--
+
+section subdomain --—————————————————————————————————————————————————————————————————————--
+variables (C : Type*) [has_zero C] [has_sub C] [has_mul C]
+
+/--
+-/
+structure SubDomain
+    := (proj         : C → C)
+       (idempotent   : Π z, proj (proj z) = proj z)
+       (respects_sub : Π x y, proj (x - y) = proj x - proj y)
+       (respects_mul : Π x y, proj (x * y) = proj x * proj y)
+
+--———————————————————————————————————————————————————————————————————————————————————————--
+variables {C} (S : SubDomain C)
+
+/--
+-/
+def SubDomain.membership
+    := membership S.proj
+
+/--
+-/
+def SubDomain.member (z) : S.membership
+    := ⟨S.proj z, S.idempotent z⟩
+
+end subdomain --—————————————————————————————————————————————————————————————————————————--
+
+section complex --———————————————————————————————————————————————————————————————————————--
+variables (C : Type*) [has_zero C] [has_one C] [has_sub C] [has_mul C]
+
+/--
+-/
+structure Complex extends DifferenceDomain C
+    := (Real            : SubDomain C)
+       (Int             : SubDomain C)
+       (abs             : C → membership Real.proj)
+       (int_is_real     : Π {z}, z ∈ Int.proj → z ∈ Real.proj)
+       (zero_is_int     : (0 : C) ∈ Int.proj)
+       (one_is_int      : (1 : C) ∈ Int.proj)
+       (real_lt         : membership Real.proj → membership Real.proj → Prop)
        (zero_lt_one     : real_lt ⟨_, int_is_real zero_is_int⟩ ⟨_, int_is_real one_is_int⟩)
 
 --———————————————————————————————————————————————————————————————————————————————————————--
-variables {C : Type*} [has_zero C] [has_one C] [has_sub C] [has_mul C]
-          (ℂ : Complex C)
+variables {C} (ℂ : Complex C)
 
 /--
 -/
-def Complex.real_part (z) : membership ℂ.real
-    := ⟨ℂ.real z, ℂ.real_idempotent z⟩
+def Complex.int
+    := ℂ.Int.proj
+
+/--
+-/
+def Complex.Z
+    := ℂ.Int.member
+
+/--
+-/
+def Complex.real
+    := ℂ.Real.proj
+
+/--
+-/
+def Complex.Re
+    := ℂ.Real.member
+
+/--
+-/
+def Complex.Imag : SubDomain C
+    := { proj := λ z, z - ℂ.real z,
+         idempotent := sorry,
+         respects_sub := sorry,
+         respects_mul := sorry, }
 
 /--
 -/
 def Complex.imag
-    := λ z, z - ℂ.real z
+    := ℂ.Imag.proj
 
 /--
 -/
-def Complex.imag_idempotent : Π z, ℂ.imag (ℂ.imag z) = ℂ.imag z
-    := sorry
+def Complex.Im
+    := ℂ.Imag.member
 
 /--
 -/
-def Complex.imag_part (z) : membership ℂ.imag
-    := ⟨ℂ.imag z, ℂ.imag_idempotent z⟩
-
-/--
--/
-instance Complex.real_has_lt : has_lt (membership ℂ.real)
+instance Complex.real_has_lt : has_lt ℂ.Real.membership
     := ⟨ℂ.real_lt⟩
 
 /--
 -/
-def Complex.int_lt (m n : membership ℂ.int)
+def Complex.int_lt (m n : ℂ.Int.membership)
     := ℂ.real_lt ⟨m.elem, ℂ.int_is_real m.is_member⟩
                  ⟨n.elem, ℂ.int_is_real n.is_member⟩
 
 /--
 -/
-instance Complex.int_has_lt : has_lt (membership ℂ.int)
+instance Complex.int_has_lt : has_lt ℂ.Int.membership
     := ⟨ℂ.int_lt⟩
 
 /--
 -/
-def Complex.zero_int : membership ℂ.int
+def Complex.zero_int : ℂ.Int.membership
     := ⟨0, ℂ.zero_is_int⟩
 
 /--
 -/
-instance Complex.int_has_zero : has_zero (membership ℂ.int)
+instance Complex.int_has_zero : has_zero ℂ.Int.membership
     := ⟨ℂ.zero_int⟩
 
 /--
 -/
-def Complex.zero_real : membership ℂ.real
+def Complex.zero_real : ℂ.Real.membership
     := ⟨0, ℂ.int_is_real ℂ.zero_is_int⟩
 
 /--
 -/
-instance Complex.real_has_zero : has_zero (membership ℂ.real)
+instance Complex.real_has_zero : has_zero ℂ.Real.membership
     := ⟨ℂ.zero_real⟩
 
 /--
 -/
-def Complex.one_int : membership ℂ.int
+def Complex.one_int : ℂ.Int.membership
     := ⟨1, ℂ.one_is_int⟩
 
 /--
 -/
-instance Complex.int_has_one : has_one (membership ℂ.int)
+instance Complex.int_has_one : has_one ℂ.Int.membership
     := ⟨ℂ.one_int⟩
 
 /--
@@ -158,7 +212,7 @@ def Complex.one_real : membership ℂ.real
 
 /--
 -/
-instance Complex.real_has_one : has_one (membership ℂ.real)
+instance Complex.real_has_one : has_one ℂ.Real.membership
     := ⟨ℂ.one_real⟩
 
 /--
@@ -198,12 +252,12 @@ section LDatum --—————————————————————
 variables {C : Type*} [has_zero C] [has_one C] [has_sub C] [has_mul C]
           (ℂ : Complex C)
 
-local notation `ℝ` := membership ℂ.real
+local notation `ℝ` := ℂ.Real.membership
 local notation `ℝ₀` := ℂ.ℝpos
-local notation `ℤ` := membership ℂ.int
+local notation `ℤ` := ℂ.Int.membership
 local notation `ℤ₀` := ℂ.ℤpos
-local notation `ℜ` := ℂ.real_part
-local notation `ℑ` := ℂ.imag_part
+local notation `ℜ` := ℂ.Re
+local notation `ℑ` := ℂ.Im
 
 local notation `|` z `|` := ℂ.abs z
 
@@ -240,7 +294,7 @@ A3:
 structure Axiom3 (m : C → ℝ)
     := (is_discrete : 𝒫 C → Type*) (has_bounded_count : 𝒫 C → Type*)
        (discrete_support       : is_discrete (supp m))
-       (horizontal_support     : ∃ y ≥ 0, (Π z, supp m z → |(ℑ z).elem| ≤ y))
+       -- (horizontal_support     : ∃ y ≥ 0, (Π z, supp m z → |(ℑ z).elem| ≤ y))
        (support_sum_bound      : empty)
        (finite_non_int_support : has_bounded_count (λ z, supp m z ∧ ¬((m z).elem ∈ ℂ.int)))
 
