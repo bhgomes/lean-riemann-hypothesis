@@ -17,9 +17,9 @@ variables (ℂ : Type*) [has_one ℂ] [DifferenceDomain ℂ]
 -/
 structure Complex
     := (real        : ℂ → ℂ)
-       (Real        : SubDomain real)
+       (Real        : Projector real)
        (int         : ℂ → ℂ)
-       (Int         : SubDomain int)
+       (Int         : Projector int)
        (abs         : ℂ → membership real)
        (int_is_real : Π {z}, z ~ int → z ~ real)
        (zero_is_int : 0 ~ int)
@@ -32,13 +32,13 @@ variables {ℂ} (ℭ : Complex ℂ)
 
 /--
 -/
-def Z
-    := ℭ.Int.member
+def is_real (z)
+    := z ~ ℭ.real
 
 /--
 -/
-def Re
-    := ℭ.Real.member
+def is_int (z)
+    := z ~ ℭ.int
 
 /--
 -/
@@ -47,7 +47,12 @@ def imag (z)
 
 /--
 -/
-def Imag : SubDomain ℭ.imag :=
+def is_imag (z)
+    := z ~ ℭ.imag
+
+/--
+-/
+def Imag : Projector ℭ.imag :=
 {
     idempotent :=
         begin
@@ -66,6 +71,16 @@ def Imag : SubDomain ℭ.imag :=
             rw DifferenceDomain.sub_inner_swap,
         end
 }
+
+/--
+-/
+def floor
+    := ℭ.Int.member
+
+/--
+-/
+def Re
+    := ℭ.Real.member
 
 /--
 -/
