@@ -32,12 +32,22 @@ section basic_instances --——————————————————
 
 /--
 -/
-instance pointwise_lt {X Y : Type*} [has_lt Y] : has_lt (X → Y)
+instance pointwise.zero {X Y : Type*} [has_zero Y] : has_zero (X → Y)
+    := ⟨↓0⟩
+
+/--
+-/
+instance pointwise.one {X Y : Type*} [has_one Y] : has_one (X → Y)
+    := ⟨↓1⟩
+
+/--
+-/
+instance pointwise.lt {X Y : Type*} [has_lt Y] : has_lt (X → Y)
     := ⟨λ f g, (Π x, f x < g x)⟩
 
 /--
 -/
-instance pointwise_le {X Y : Type*} [has_le Y] : has_le (X → Y)
+instance pointwise.le {X Y : Type*} [has_le Y] : has_le (X → Y)
     := ⟨λ f g, (Π x, f x ≤ g x)⟩
 
 /--
@@ -47,12 +57,12 @@ instance lt_has_le {Y : Type*} [has_lt Y] : has_le Y
 
 /--
 -/
-instance pointwise_sub {X Y : Type*} [has_sub Y] : has_sub (X → Y)
+instance pointwise.sub {X Y : Type*} [has_sub Y] : has_sub (X → Y)
     := ⟨λ f g, (λ x, f x - g x)⟩
 
 /--
 -/
-instance pointwise_mul {X Y : Type*} [has_mul Y] : has_mul (X → Y)
+instance pointwise.mul {X Y : Type*} [has_mul Y] : has_mul (X → Y)
     := ⟨λ f g, (λ x, f x * g x)⟩
 
 end basic_instances --———————————————————————————————————————————————————————————————————--
@@ -72,6 +82,39 @@ structure membership {X : Type*} (I : X → X)
 namespace membership --——————————————————————————————————————————————————————————————————--
 variables {X : Type*} (I : X → X)
 
-/- --- -/
+/--
+-/
+instance : has_coe (membership I) X
+    := ⟨membership.elem⟩
+
+section zero --——————————————————————————————————————————————————————————————————————————--
+variables [has_zero X] {I} (m : 0 ~ I)
+
+/--
+-/
+def zero : membership I
+    := ⟨0, m⟩
+
+/--
+-/
+instance : has_zero (membership I)
+    := ⟨zero m⟩
+
+end zero --——————————————————————————————————————————————————————————————————————————————--
+
+section one --———————————————————————————————————————————————————————————————————————————--
+variables [has_one X] {I} (m : 1 ~ I)
+
+/--
+-/
+def one : membership I
+    := ⟨1, m⟩
+
+/--
+-/
+instance : has_one (membership I)
+    := ⟨one m⟩
+
+end one --———————————————————————————————————————————————————————————————————————————————--
 
 end membership --————————————————————————————————————————————————————————————————————————--
