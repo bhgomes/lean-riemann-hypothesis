@@ -6,6 +6,7 @@
 | @source:  arXiv:1308.3067v2 [math.NT] 13 Feb 2015                           |
 \- ------------------------------------------------------------------------- -/
 
+import .analysis
 import .complex
 import .reduction
 
@@ -25,7 +26,7 @@ def supp {X Y : Type*} [has_zero Y] (f : X → Y)
 /--
 -/
 def lim0 {X Y} : (X → Y) → Y
-    := sorry
+    := sorry --! Reduction
 
 /--
 -/

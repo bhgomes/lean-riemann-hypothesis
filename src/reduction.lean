@@ -15,8 +15,13 @@ variables {X : Type*} {Y : Type*} (ℱ : 𝒫 (X → Y))
 
 /--
 -/
-def Reduction
+def Reduction.action
     := Π f, ℱ f → Y
+
+/--
+-/
+structure Reduction
+    := (reduce : Reduction.action ℱ)
 
 /--
 -/
@@ -56,20 +61,23 @@ variables (𝒮 : Reduction ℱ)
 /--
 -/
 def left_factors (β : Y → Y) (lcβ : left_closed ℱ β)
-    := Π f (fℱ : ℱ f), 𝒮 (β ∘ f) (lcβ f fℱ) = β (𝒮 f fℱ)
+    := Π f (fℱ : ℱ f), 𝒮.reduce (β ∘ f) (lcβ f fℱ) = β (𝒮.reduce f fℱ)
+
+end Reduction --—————————————————————————————————————————————————————————————————————————--
 
 /--
 -/
-class Unital [PointFamily ℱ]
-    := (constant_reduction : Π y, 𝒮 ↓y (PointFamily.has_constants ℱ y) = y)
+structure UnitalReduction [PointFamily ℱ] extends Reduction ℱ
+    := (constant_reduction : Π y, reduce ↓y (PointFamily.has_constants ℱ y) = y)
 
 /--
 -/
-class Monotonic [has_le Y]
-    := (monotonicity : Π f g {fℱ gℱ}, (f ≤ g) → (𝒮 f fℱ ≤ 𝒮 g gℱ))
+structure MonotonicReduction [has_le Y] extends Reduction ℱ
+    := (monotonicity : Π f g {fℱ gℱ}, (f ≤ g) → (reduce f fℱ ≤ reduce g gℱ))
 
-section translative --———————————————————————————————————————————————————————————————————--
+namespace TranslativeReduction --————————————————————————————————————————————————————————--
 variables [has_le Y] [has_zero Y] [has_sub Y] [PointFamily ℱ] [DifferenceFamily ℱ]
+          (reduce : Reduction.action ℱ)
 
 open PointFamily DifferenceFamily
 
@@ -77,20 +85,20 @@ open PointFamily DifferenceFamily
 -/
 def constant_difference_property
     := Π f k {fℱ},
-         𝒮 (f - ↓k) (closure f ↓k fℱ (has_constants ℱ k))
-       = 𝒮 f fℱ - 𝒮 ↓k (has_constants ℱ k)
+         reduce (f - ↓k) (closure f ↓k fℱ (has_constants _ _))
+       = reduce f fℱ - reduce ↓k (has_constants _ _)
 
 /--
 -/
 def translation_invariance_property
-    := Π f g {fℱ gℱ}, 0 ≤ 𝒮 (g - f) (closure g f gℱ fℱ) → 𝒮 f fℱ ≤ 𝒮 g gℱ
+    := Π f g {fℱ gℱ}, 0 ≤ reduce (g - f) (closure g f gℱ fℱ) → reduce f fℱ ≤ reduce g gℱ
+
+end TranslativeReduction --——————————————————————————————————————————————————————————————--
 
 /--
 -/
-class Translative
-    := (constant_difference    : constant_difference_property ℱ 𝒮)
-       (translation_invariance : translation_invariance_property ℱ 𝒮)
-
-end translative --———————————————————————————————————————————————————————————————————————--
-
-end Reduction --—————————————————————————————————————————————————————————————————————————--
+structure TranslativeReduction
+    [has_le Y] [has_zero Y] [has_sub Y] [PointFamily ℱ] [DifferenceFamily ℱ]
+    extends Reduction ℱ
+    := (constant_difference    : TranslativeReduction.constant_difference_property ℱ reduce)
+       (translation_invariance : TranslativeReduction.translation_invariance_property ℱ reduce)

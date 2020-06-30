@@ -28,6 +28,14 @@ def const {X Y : Sort*}
     := λ b : Y, (λ x : X, b)
 notation `↓`:max y:max := const y
 
+/--
+-/
+structure Iff (X Y : Sort*)
+    := (forward : X → Y)
+       (reverse : Y → X)
+
+notation X `←→` Y := Iff X Y
+
 section basic_instances --———————————————————————————————————————————————————————————————--
 
 /--
