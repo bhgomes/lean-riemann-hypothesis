@@ -39,7 +39,7 @@ def extends_to_schwartz : (X → Y) → 𝒫 Y → Type*
 namespace LFunction --———————————————————————————————————————————————————————————————————--
 variables {I : Type*} {C : Type*}
           [has_one C] [has_neg C] [has_mul C]
-          {summable : 𝒫 (I → C)} (Sum : Reduction summable)
+          (summable : 𝒫 (I → C)) (Sum : Reduction summable)
           (pow : I → C → C) (χ : I → C) (s : C)
 
 /--
@@ -52,9 +52,11 @@ def series_term
 def series_convergence_criterion
     := summable (series_term pow χ s)
 
+variables {summable}
+
 /--
 -/
-def series (convergence : series_convergence_criterion pow χ s)
+def series (convergence : series_convergence_criterion summable pow χ s)
     := Sum.reduce (series_term pow χ s) convergence
 
 end LFunction --—————————————————————————————————————————————————————————————————————————--

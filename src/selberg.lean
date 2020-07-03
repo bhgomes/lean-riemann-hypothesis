@@ -64,8 +64,18 @@ structure Axiom1 /-FIXME: [has_bigO (ℤ₀⁺ → ℂ)] [has_bigO (ℂ → ℂ)
 
 /--
 -/
-def K_scaled (K : ℝ₀⁺ → ℂ)
+def scaled_kernel (K : ℝ₀⁺ → ℂ)
     := λ x : ℝ₀⁺, x.elem * K x
+
+/--
+-/
+def scaled_kernel_has_limit (K : ℝ₀⁺ → ℂ)
+    := has_limit_at_0 (scaled_kernel K)
+
+/--
+-/
+def kernel_degree (K : ℝ₀⁺ → ℂ) (has_limit : scaled_kernel_has_limit K)
+    := 2 * lim0.reduce _ has_limit
 
 /--
 A2:
@@ -73,9 +83,9 @@ A2:
 - lim_{x→0^+}(x * K(x)) ∈ ℝ
 -/
 structure Axiom2 (K : ℝ₀⁺ → ℂ)
-    := (schwartz_extension        : extends_to_schwartz (K_scaled K) ℭ.is_real)
-       (limit_at_zero_convergence : has_limit_at_0 (K_scaled K))
-       (limit_is_real_at_zero     : ℭ.is_real (lim0.reduce _ limit_at_zero_convergence))
+    := (schwartz_extension        : extends_to_schwartz (scaled_kernel K) ℭ.is_real)
+       (limit_at_zero_convergence : scaled_kernel_has_limit K)
+       (real_degree               : kernel_degree lim0 K limit_at_zero_convergence ~ ℭ.real)
 
 local notation `abs_ℜ_le` T := λ z, |ℜ z| ≤ T
 
@@ -150,15 +160,33 @@ variables (F : LDatum ℭ
 L-Function
 - L_F(s) := ∑_{n=1}^∞ a_F(n) n^-s = exp(∑_{n=2}^∞ f(n) / log(n) * n ^ {1/2 - s}) for ℜ(s) > 1
 -/
-def L (s : ℂ) (σ₁ : ℜ s > 1)
+def L_exp_form (s : ℂ) (σ₁ : ℜ s > 1)
     := exp (sum 2 (λ n, F.f n / log n * pow n (2⁻¹ - s)))
+
+/--
+-/
+def L_character_convergence_criterion (s : ℂ) (σ₁ : ℜ s > 1)
+    := empty
+
+/--
+-/
+def L : LFunction (Sumℤpos 1) (λ b, pow b) := {
+    character :=
+        begin
+            repeat {sorry},
+        end,
+    continuation := {
+        domain := sorry,
+        extension := sorry,
+        map := sorry,
+    }}
 
 /--
 Degree of F
 - d_F := 2 * lim_{x → 0^+} xK(x)
 -/
 def degree
-    := 2 * lim0.reduce _ F.axiom2.limit_at_zero_convergence
+    := kernel_degree lim0 F.K F.axiom2.limit_at_zero_convergence
 
 /--
 Analytic Conductor of F
