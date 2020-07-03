@@ -7,6 +7,7 @@
 \- ------------------------------------------------------------------------- -/
 
 import .analysis
+import .asymptotic
 import .complex
 import .reduction
 
@@ -15,50 +16,6 @@ import .reduction
 
 ...
 -/
-
-section analysis --——————————————————————————————————————————————————————————————————————--
-
-/--
--/
-def supp {X Y : Type*} [has_zero Y] (f : X → Y)
-    := λ x, f x ≠ 0
-
-/--
--/
-def lim0 {X Y} : (X → Y) → Y
-    := sorry --! Reduction
-
-/--
--/
-def extends_to_schwartz {X Y} : (X → Y) → 𝒫 Y → Type*
-    := sorry
-
-/--
--/
-def is_discrete {X : Type*} : 𝒫 X → Type*
-    := sorry
-
-/--
--/
-def has_bounded_count {X : Type*} : 𝒫 X → Type*
-    := sorry
-
-/--
--/
-def is_smooth {X Y} : (X → Y) → Type*
-    := sorry
-
-/--
--/
-def is_compact {X : Type*} : 𝒫 X → Type*
-    := sorry
-
-/--
--/
-def fourier_transform {X Y} : (X → Y) → (Y → Y)
-    := sorry
-
-end analysis --——————————————————————————————————————————————————————————————————————————--
 
 --———————————————————————————————————————————————————————————————————————————————————————--
 variables {ℂ : Type*} [DifferenceAlgebra ℂ] {ℭ : Complex ℂ}
@@ -77,6 +34,20 @@ local notation `pow` := ℭ.exp.pow
 local notation `|` z `|` := ℭ.abs z
 local notation `⌊` z `⌋` := ℭ.floor z
 
+variables {has_limit_at_0    : 𝒫 (ℝ₀⁺ → ℂ)}
+          (lim0              : Reduction has_limit_at_0)
+          (is_discrete       : 𝒫 (ℂ → Sort))
+          {support_summable  : (ℂ → Prop) → 𝒫 (ℂ → ℂ)}
+          (support_sum       : Π 𝔇, Reduction (support_summable 𝔇))
+          (finitely_many     : 𝒫 (ℂ → Sort))
+          (is_smooth_ℝℂ      : 𝒫 (ℝ → ℂ))
+          (is_compact        : 𝒫 (ℝ → Sort))
+          (fourier_transform : (ℝ → ℂ) → (ℂ → ℂ))
+          {ℝpos_integrable   : 𝒫 (ℝ₀⁺ → ℂ)}
+          (Intℝpos           : Reduction ℝpos_integrable)
+          {ℤpos_summable     : 𝒫 (ℤ₀⁺ → ℂ)}
+          (Sumℤpos           : ℤ₀⁺ → Reduction ℤpos_summable)
+
 namespace LDatum --——————————————————————————————————————————————————————————————————————--
 
 /--
@@ -85,11 +56,11 @@ A1:
 - ∀k > 0, f(n) * log^k n <<_k 1
 - ∀ε > 0, ∑_{n ≤ x}|f(n)|^2 <<_ε x^ε
 -/
-structure Axiom1 (f : ℤ₀⁺ → ℂ)
+structure Axiom1 /-FIXME: [has_bigO (ℤ₀⁺ → ℂ)] [has_bigO (ℂ → ℂ)]-/ (f : ℤ₀⁺ → ℂ)
     := (bounded     : ℂ → (ℤ₀⁺ → ℂ) → (ℂ → ℂ) → Type*)
        (real_at_one : ℭ.is_real (f 1))
-       (log_bound   : Π k : ℤ₀⁺, bounded k (λ n, f n * pow (log n) k) 1)
-       (sum_bound   : empty)
+       -- (log_bound   : Π k : ℤ₀⁺, (λ n, f n * pow (log n) k) ≪ ↓1)
+       -- (sum_bound   : Π ε : ℝ₀⁺, (λ x, /-FIXME:-/ 0) ≪ (λ x, pow x ε))
 
 /--
 -/
@@ -102,8 +73,11 @@ A2:
 - lim_{x→0^+}(x * K(x)) ∈ ℝ
 -/
 structure Axiom2 (K : ℝ₀⁺ → ℂ)
-    := (schwartz_extension : extends_to_schwartz (K_scaled K) ℭ.is_real)
-       (real_limit         : ℭ.is_real (lim0 (K_scaled K)))
+    := (schwartz_extension        : extends_to_schwartz (K_scaled K) ℭ.is_real)
+       (limit_at_zero_convergence : has_limit_at_0 (K_scaled K))
+       (limit_is_real_at_zero     : ℭ.is_real (lim0.reduce _ limit_at_zero_convergence))
+
+local notation `abs_ℜ_le` T := λ z, |ℜ z| ≤ T
 
 /--
 A3:
@@ -114,9 +88,25 @@ A3:
 -/
 structure Axiom3 (m : ℂ → ℝ)
     := (discrete_support       : is_discrete (supp m))
-       (horizontal_support     : ∃ y ≥ 0, (Π z, supp m z → |ℑ z| ≤ y))
-       (support_sum_bound      : empty)
-       (finite_non_int_support : has_bounded_count (λ z, supp m z ∧ ¬(m z ~ ℭ.int)))
+       (horizontal_support     : ∃ y ≥ 0, Π z, supp m z → |ℑ z| ≤ y)
+       (support_sum_converges  : Π T, support_summable (abs_ℜ_le T) (λ z, ℭ.abs (m z)))
+       (temp_                  : Π T, (support_sum _).reduce _ (support_sum_converges T) = 0)
+       (support_sum_bound      : empty) -- FIXME: ∃ A ≥ (0 : ℝ), (λ T, 0) ≪ (λ T, 1 + pow T A))
+       (finite_non_int_support : finitely_many (λ z, supp m z ∧ ¬(m z ~ ℭ.int)))
+
+/--
+-/
+structure axiom4_property (f : ℤ₀⁺ → ℂ) (K : ℝ₀⁺ → ℂ) (m : ℂ → ℝ) (g : ℝ → ℂ)
+    := (smooth                    :  is_smooth_ℝℂ g)
+       (compact_support           :  is_compact (supp g))
+       (transform                 := fourier_transform g)
+       (transform_real_on_reals   :  Π r : ℝ, transform r ~ ℭ.real)
+       (support_sum_converges     :  support_summable (λ z, true) (λ z, m z * transform z))
+       (kernel_integral_converges :  ℝpos_integrable (λ x, K x * (g 0 - g x.to_membership)))
+       (sum_converges             :  ℤpos_summable (λ n, f n * g (ℭ.abs (log n))))
+       (fourier_equality          :  (support_sum _).reduce _ support_sum_converges
+                                  =  2 * ℜ (Intℝpos.reduce _ kernel_integral_converges
+                                                - (Sumℤpos 1).reduce _ sum_converges))
 
 /--
 A4:
@@ -125,8 +115,9 @@ A4:
         ∑_{z∈supp(m)}m(z)h(z) = 2*ℜ( ∫_0^∞ K(x)(g(0) - g(x))dx - ∑_{n=1}^∞ f(n)g(log n) )
 -/
 structure Axiom4 (f : ℤ₀⁺ → ℂ) (K : ℝ₀⁺ → ℂ) (m : ℂ → ℝ)
-    := (special_equality : Type*)
-       (fourier_equality : Π (g : ℝ → ℂ) {_ : is_smooth g} {_ : is_compact (supp g)}, special_equality)
+    := (property : Π g, axiom4_property
+                            support_sum is_smooth_ℝℂ is_compact fourier_transform
+                                Intℝpos Sumℤpos f K m g)
 
 end LDatum --————————————————————————————————————————————————————————————————————————————--
 
@@ -137,22 +128,22 @@ include ℭ
 /--
 -/
 structure LDatum
-    := (f  : ℤ₀⁺ → ℂ)
-       (K  : ℝ₀⁺ → ℂ)
-       (m  : ℂ   → ℝ)
-       (a1 : LDatum.Axiom1 f)
-       (a2 : LDatum.Axiom2 K)
-       (a3 : LDatum.Axiom3 m)
-       (a4 : LDatum.Axiom4 f K m)
+    := (f      : ℤ₀⁺ → ℂ)
+       (K      : ℝ₀⁺ → ℂ)
+       (m      : ℂ   → ℝ)
+       (axiom1 : LDatum.Axiom1 f)
+       (axiom2 : LDatum.Axiom2 lim0 K)
+       (axiom3 : LDatum.Axiom3 is_discrete support_sum finitely_many m)
+       (axiom4 : LDatum.Axiom4 support_sum is_smooth_ℝℂ is_compact fourier_transform Intℝpos Sumℤpos f K m)
 
 omit ℭ
 variables {ℭ}
 --———————————————————————————————————————————————————————————————————————————————————————--
 
 namespace LDatum --——————————————————————————————————————————————————————————————————————--
-variables (F : LDatum ℭ)
-          --! (summable_sequences : 𝒫 (ℤ₀⁺ → ℂ))
-          --! (sum : Reduction summable_sequences)
+variables (F : LDatum ℭ
+                lim0 is_discrete support_sum finitely_many
+                    is_smooth_ℝℂ is_compact fourier_transform Intℝpos Sumℤpos)
           (sum : ℕ → (ℤ₀⁺ → ℂ) → ℂ)
 
 /--
@@ -167,7 +158,7 @@ Degree of F
 - d_F := 2 * lim_{x → 0^+} xK(x)
 -/
 def degree
-    := 2 * lim0 (LDatum.K_scaled F.K)
+    := 2 * lim0.reduce _ F.axiom2.limit_at_zero_convergence
 
 /--
 Analytic Conductor of F
@@ -179,7 +170,7 @@ def conductor
 F is positive if
 - there are at most finitely many z ∈ ℂ with m(z) < 0
 -/
-def is_positive (finitely_many_negative : (ℂ → ℝ) → Type*)
-    := finitely_many_negative F.m
+def is_positive
+    := finitely_many (λ z, F.m z < 0)
 
 end LDatum --————————————————————————————————————————————————————————————————————————————--
