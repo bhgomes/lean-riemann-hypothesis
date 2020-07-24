@@ -32,7 +32,7 @@
 \title[Formalizing the Riemann Hypothesis]{Formalizing the Riemann Hypothesis in the Lean Interactive Theorem Prover}
 
 \begin{abstract}
-Abstract
+In this paper we present a formalization of the statement of the Riemann Hypothesis in the Lean Theorem Prover using elementary methods in analysis.
 \end{abstract}
 
 \date{\today}
@@ -41,13 +41,7 @@ Abstract
 
 \section{Introduction}
 
-\subsection{Motivation}
-
-% TODO
-
-\subsection{Project Goals}
-
-% TODO
+The Riemann Hypothesis is a famous and important problem first studied by Bernhard Riemann which has profound consequences for the distribution of prime numbers. This project aims to formalize the statement of the Riemann Hypothesis in the Lean Theorem Prover using elementary arguments from Analysis. This paper covers the proofs informally without maipulation of proof witnesses directly. The project is hosted on GitHub at \href{https://github.com/bhgomes/lean-riemann-hypothesis}{github.com/bhgomes/lean-riemann-hypothesis} which covers all of the proofs in detail.
 
 \section{Construction}
 
@@ -130,21 +124,125 @@ We weaken the right hand side factor of $|x|^2$ to $|x|$ since $|x| < 1$ and we 
 \]
 so we have found our constant and the inequality is proved. From this fact we deduce that the Dirichlet Eta function converges for $\Re(s) > 0$.
 
-\section{Lean Details}
+\section{Sequence Proofs}
 
 Implementing this construction in the Lean Theorem Prover requires that we provide proofs of the Condensation Test, geometric series convergence, and the Comparison Test. 
 
 \subsection{Comparison Test}
 
-% TODO
+This is a standard result which follows from the triangle inequality and the triangle equality (for series with terms that are greater than or equal to zero).
 
 \subsection{Condensation Test}
 
-% TODO
+The Cauchy-Schl\"omilch Condensation Test states, that if we have a sequence $p$ which is greater than or equal to zero, and whose terms are not increasing, then for any $\phi : \mathbb{N} \to \mathbb{N}$ which is strictly increasing, then the convergence of the following implies the convergence of the partial sums of $p$:
+\[
+    \sum_{k\geq 0}(\phi_{k+1} - \phi_k) \cdot p_{\phi_k}
+\]
+To prove this we first prove that the following convergence implication holds
+\[
+    \sum_{k\geq 0}\sum_{j=\phi_k}^{\phi_{k+1}}p_j \to \sum_{k\geq 0}p_{k + \phi_0}
+\]
+Now assume we are given the convergence of the left hand side, and an $\epsilon > 0$, then for this $\epsilon$ we get an $N$ from the convegence of the left hand side where for $n \geq N$ we have
+\[
+    \left|\sum_{k=N}^n\sum_{k=\phi_k}^{\phi_{k+1}}p_j\right| < \epsilon
+\]
+We want to find an $M$ large enough so that for $m\geq M$, we have
+\[
+    \left|\sum_{k=M}^m p_{k+\phi_0}\right| < \epsilon
+\]
+The correct $M$ in this case is $\phi_I - \phi_0$. Plugging in $M$, we have
+\[
+    \left|\sum_{k=\phi_I - \phi_0}^m p_{k+\phi_0} \right| < \epsilon
+\]
+We can simplify this to 
+\[
+    \left|\sum_{k=0}^{m + \phi_0 - \phi_I}p_{k+\phi_I}\right| < \epsilon
+\]
+If we then take $n$ to be $m + \phi_0$ and collapse the double sum, we have
+\[
+    \left|\sum_{k=0}^{\phi_{m+\phi_0} - \phi_I} p_{k+\phi_I} \right| < \epsilon
+\]
+Since $\phi$ is strictly increasing, we have $m+\phi_0 \leq \phi_{m+\phi_0}$ and by monotonicity of the summation, we have
+\[
+    \left| \sum_{k=0}^{m+\phi_0 - \phi_I}p_{k+\phi_I}\right| \leq \left|\sum_{k=0}^{\phi_{m+\phi_0} - \phi_I} p_{k+\phi_I}\right| < \epsilon
+\]
+Now that this implication is resolved, we need only show that this sequence
+\[
+    \sum_{j=\phi_k}^{\phi_{k+1}}p_j
+\]
+is bounded above by 
+\[
+    \left(\phi_{k+1} - \phi_{k}\right) p_{\phi_k}
+\]
+Writing this term as a repeated sum and simplifying both sides, the comparison becomes
+\[
+    \sum_{j=0}^{\phi_{k+1} - \phi_k} p_{j + \phi_k} \leq \sum_{j=0}^{\phi_{k+1} - \phi_k}p_{\phi_k}
+\]
+By monotonicity, we need only to prove that for any $j\geq0$
+\[
+    p_{j + \phi_k} \leq p_{\phi_k}
+\]
+And this follows from the fact that $p$ was assumed to be non-increasing. So the proof is complete.
+
+The form of the Cauchy-Schl\"omilch comparison test that we use in the earlier proof is the case $\phi_n = 2^n$. The successive differences simplify,
+\[
+    2^{n+1} - 2^n = 2^n + 2^n - 2^n = 2^n
+\]
+So that we get
+\[
+    \sum_{k\geq0}2^k p_{2^k}
+\]
+as our Cauchy-Schl\"omilch condensed series.
 
 \subsection{Geometric Series Convergence}
 
-% TODO
+To prove that the geometric series converges, we first prove the following formula by induction 
+\[
+    \frac{1 - x ^ n}{1 - x} = \sum_{k=0}^n x^k
+\]
+In the zero case we have,
+\[
+    \frac{1 - x ^ 0}{1 - x} = 0
+\]
+Which is true since $x ^ 0 = 1$. For the successor case we have,
+\[
+    \frac{1 - x ^ {n+1}}{1 - x} = \sum_{k=0}^{n+1} x ^ k
+\]
+Expanding the power and the sum, we get,
+\[
+    \frac{1 - x ^ n \cdot x}{1 - x} = x ^ n + \sum_{k=0}^n x ^ k
+\]
+By the induction hypothesis,
+\[
+    \frac{1 - x ^ n \cdot x}{1 - x} = x ^ n + \frac{1 - x ^ n}{1 - x}
+\]
+Simplifying, we see that both sides are equal.
+
+Once we have this formula for the $n$th partial sum, we begin the proof of convergence to $(1 - x)^{-1}$ by choosing an $\epsilon > 0$. The correct index to start finding terms within $\epsilon$ of the limit is
+\[
+    N := \left \lceil{\frac{\log(\epsilon\cdot|1 - x|)}{\log|x|}}\right \rceil + 1
+\]
+For $n \geq N$, we want to show that,
+\[
+    \left| \frac{1 - x ^ n}{1 - x} - \frac{1}{1 - x}\right| < \epsilon
+\]
+Simplifying, we have
+\[
+    |x|^n < \epsilon \cdot |1 - x|
+\]
+Taking the logarithm of both sides,
+\[
+    n\log|x| < \log(\epsilon\cdot|1 - x|)
+\]
+Since $|x| < 1$, $\log|x| < 0$, so when we divide both sides by that term we switch the direction of the inequality,
+\[
+    n > \frac{\log(\epsilon\cdot|1-x|)}{\log|x|}
+\]
+Since $N \leq n$, then $n$ satisfies this inequality and we are done.
+
+\section{Future Work}
+
+In the future, we would like to expand the construction of the Riemann Hypothesis to other domains such as the Selberg Class or global fields of characteristic $p$ or to elliptic curves. We would also like to expand our scope to constructions in the entire Langlands Program and start to build a formalization there.
 
 \newpage
 
