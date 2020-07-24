@@ -1,0 +1,108 @@
+a
+{
+    text-decoration: none;
+    color: #062EB2;
+}
+
+a.profile
+{
+    text-decoration: none;
+    color: black;
+}
+
+.asset-button
+{
+    color: #000000; 
+    background: #F5F5DC;
+    margin-left: 0.25rem;
+    margin-right: 0.25rem;
+}
+
+.asset-button:hover
+{
+    color: #000000;
+    background: #99E6FF;
+    border-color: #000000;
+}
+
+.button-image
+{
+    height: 14px;
+    vertical-align: text-bottom;
+}
+
+code
+{
+    background: #F9F9F9;
+    border: 1px solid #E9E9E9; 
+    color: #606060;
+}
+
+.code-snippet > pre > code:hover
+{
+    background: #FFFFFF;
+}
+
+pre > code
+{
+    overflow: auto;
+}
+
+.container
+{
+    max-width: 1024px;
+}
+
+.header
+{
+    margin-top: 3rem;
+    text-align: center;
+}
+
+.footer
+{
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+img.profile
+{
+    border-radius: 1.618rem;
+    box-shadow: 0.2rem 0.3rem 1rem #CCCCCC;
+}
+
+a#name:hover
+{
+    text-decoration: underline;
+}
+
+a#def
+{
+    color: #00A7E1; /*#4785AE;*/
+    font-style: italic;
+}
+
+a#name
+{
+    color: #000000;
+    /* font-weight: bold; */
+}
+
+a#weak
+{
+    color: #AAAAAA;
+}
+
+@media (min-width: 550px)
+{
+    .header
+    {
+        margin-top: 12rem;
+    }
+
+    .footer
+    {
+        margin-bottom: 5rem;
+    }
+}
+
