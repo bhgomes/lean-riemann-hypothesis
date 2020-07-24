@@ -1,247 +1,220 @@
-/- ------------------------------------------------------------------------- -\
+/- ------------------------------------------------------------------------- -|
 | @project: riemann_hypothesis                                                |
 | @file:    complex.lean                                                      |
 | @author:  Brandon H. Gomes                                                  |
 | @affil:   Rutgers University                                                |
-\- ------------------------------------------------------------------------- -/
+|- ------------------------------------------------------------------------- -/
 
-import .algebra
+import .exponential
 
 /-!
 -/
 
 --———————————————————————————————————————————————————————————————————————————————————————--
-variables (ℂ : Type*) [DifferenceAlgebra ℂ]
 
 /--
 -/
-structure Exp
-    := (exp             : ℂ → ℂ)
-       (exp_zero_is_one : exp 0 = 1)
-       (log             : ℂ → ℂ)
-       (exp_log_inverse : Π {z}, exp (log z) = z)
+class Algebra (α : Type*)
+    extends has_zero α, has_one α, has_neg α, has_add α, has_sub α, has_mul α, has_inv α
 
-namespace Exp --—————————————————————————————————————————————————————————————————————————--
-variables {ℂ} (ℯ : Exp ℂ)
+--———————————————————————————————————————————————————————————————————————————————————————--
+variables (ℂ : Type*) (ℝ : Type*)
 
-/--
--/
-def pow (b z)
-    := ℯ.exp (ℯ.log b * z)
+variables [preorder ℝ] [Algebra ℝ]
+
+variables [Algebra ℂ]
+
+variables [has_lift_t ℝ ℂ]
 
 /--
 -/
-instance : has_pow ℂ ℂ
-    := ⟨ℯ.pow⟩
-
-/--
--/
-def pow_zero_is_one : Π b, ℯ.pow b 0 = 1 :=
-    begin
-        intros,
-        rw pow,
-        rw DifferenceAlgebra.zero_right_absorb,
-        rw exp_zero_is_one,
-    end
-
-end Exp --———————————————————————————————————————————————————————————————————————————————--
-
-/--
--/
-structure ComplexBase
-    := (real        : ℂ → ℂ)
-       (int         : ℂ → ℂ)
-       (Real        : HomomorphicProjector real has_sub.sub)
-       (Int         : SubProjector int real)
-       (real_lt     : membership real → membership real → Prop)
-       (zero_is_int : 0 ~ int)
-       (one_is_int  : 1 ~ int)
-
-namespace ComplexBase --—————————————————————————————————————————————————————————————————--
-variables {ℂ} (ℭ : ComplexBase ℂ)
-
-local notation `ℝ` := membership ℭ.real
-local notation `ℤ` := membership ℭ.int
-
-/--
--/
-instance real_has_lt : has_lt ℝ
-    := ⟨ℭ.real_lt⟩
-
-/--
--/
-instance int_has_lt : has_lt ℤ
-    := ⟨λ p q, ℭ.Int.lifted p < ℭ.Int.lifted q⟩
-
-/--
--/
-instance real_has_zero : has_zero ℝ
-    := ⟨⟨0, ℭ.Int.inclusion ℭ.zero_is_int⟩⟩
-
-/--
--/
-instance real_has_one : has_one ℝ
-    := ⟨⟨1, ℭ.Int.inclusion ℭ.one_is_int⟩⟩
-
-/--
--/
-instance int_has_zero : has_zero ℤ
-    := membership.has_zero (ℭ.zero_is_int)
-
-/--
--/
-instance int_has_one : has_one ℤ
-    := membership.has_one (ℭ.one_is_int)
-
-end ComplexBase --———————————————————————————————————————————————————————————————————————--
-
-/--
--/
-structure Complex extends ComplexBase ℂ
-    := (zero_lt_one : 0 < (1 : membership real))
-       (abs_map     : ℂ → ℂ)
-       (Abs         : AbsoluteValue Real abs_map)
-       (exp         : Exp ℂ)
+structure Complex
+    := (real_part                : ℂ → ℝ)
+       (abs                      : ℂ → ℝ)
+       (exp                      : ℂ → ℂ)
+       (real_explog              : ExpLog ℝ ℝ)
+       (abs_nonneg               : Π z, 0 ≤ abs z)
+       (exp_nonzero              : Π z, exp z ≠ 0)
+       (exp_homomorphism_zero    : exp 0 = 1)
+       (exp_homomorphism         : Π w z, exp (w + z) = exp w * exp z)
+       (exp_homomorphism_inv     : Π w z, exp (w - z) = exp w * (exp z)⁻¹)
+       (real_part_scaling        : Π x z, real_part (↑x * z) = x * real_part z)
+       (abs_exp_is_exp_real_part : Π z, abs (exp z) = real_explog.exp (real_part z))
+       (exp_linearization        : Π x, abs x ≤ 1
+                                 → Π z, abs (exp (x * z) - (x * z + 1))
+                                      ≤ (abs x * abs x) * real_explog.exp (abs z))
+       (real_log_bound           : Π x (p : 0 < 1 - x), abs ↑x ≤ 2⁻¹
+                                      → abs ↑(real_explog.log (1 - x) p)
+                                      ≤ abs ↑x * 2)
 
 namespace Complex --—————————————————————————————————————————————————————————————————————--
-variables {ℂ} (ℭ : Complex ℂ)
-
-local notation `ℝ` := membership ℭ.real
-local notation `ℤ` := membership ℭ.int
+variables {ℂ ℝ} (ℭ : Complex ℂ ℝ)
 
 /--
 -/
-def abs
-    := ℭ.Abs.to_SubProjector.by_inclusion
+def real_abs (x : ℝ)
+    := ℭ.abs (↑x)
 
 /--
 -/
-instance : has_lt ℂ
-    := ⟨λ p q, ℭ.abs p < ℭ.abs q⟩
+def real_exp (x)
+    := ℭ.real_explog.exp x
 
 /--
 -/
-def is_real (z)
-    := z ~ ℭ.real
+def real_log (x)
+    := ℭ.real_explog.log x
 
 /--
 -/
-def Re
-    := ℭ.Real.as_member
+def pow (a apos x)
+    := ℭ.exp (↑(ℭ.real_explog.log a apos) * x)
 
 /--
 -/
-def imag (z)
-    := z - ℭ.real z
+def pow_domain_irrel
+    (x xpos)
+    (y ypos)
+    (z)
+    : x = y → ℭ.pow x xpos z = ℭ.pow y ypos z :=
+    begin
+        intros x_eq_y,
+        rw [pow, pow],
+        rw ExpLog.log_domain_irrel _ _ _ _ _ x_eq_y,
+    end
 
 /--
 -/
-def is_imag (z)
-    := z ~ ℭ.imag
+def pow_nonzero (a apos x)
+    : ℭ.pow a apos x ≠ 0
+    := ℭ.exp_nonzero _
 
 /--
 -/
-def Imag : HomomorphicProjector ℭ.imag has_sub.sub := {
-    idempotent :=
-        begin
-            intros,
-            repeat { rw imag },
-            rw [ℭ.Real.homomorphic,
-                ℭ.Real.idempotent,
-                DifferenceDomain.sub_cancel,
-                DifferenceDomain.sub_right_id],
-        end,
-    homomorphic :=
-        begin
-            rw homomorphism,
-            intros,
-            repeat { rw imag },
-            rw [ℭ.Real.homomorphic, DifferenceDomain.sub_inner_swap],
-        end }
+def pow_neg_exponent_inverts
+    [has_left_sub_distributivity ℂ]
+    [has_zero_right_absorb ℂ]
+    [has_left_unit ℂ]
+    (a apos x)
+    : ℭ.pow a apos (0 - x) = (ℭ.pow a apos x)⁻¹ :=
+    begin
+        rw pow,
+        rw has_left_sub_distributivity.eq,
+        rw has_zero_right_absorb.eq,
+        rw exp_homomorphism_inv,
+        rw exp_homomorphism_zero,
+        rw has_left_unit.eq,
+        rw ← pow,
+    end
 
 /--
 -/
-def Im
-    := ℭ.Imag.as_member
+def abs_pow_is_real_pow (x xpos z)
+    : ℭ.abs (ℭ.pow x xpos z) = ℭ.real_explog.pow x xpos (ℭ.real_part z)
+    := by rw [pow, abs_exp_is_exp_real_part, real_part_scaling, ExpLog.pow]
+
+--———————————————————————————————————————————————————————————————————————————————————————--
+local notation `|` z `|` := ℭ.abs z
 
 /--
 -/
-def is_int (z)
-    := z ~ ℭ.int
+def one_minus_pow_bound
+    [has_add_le_add ℝ]
 
-/--
--/
-def floor
-    := ℭ.Int.as_member
+    [has_left_unit ℝ]
+    [has_right_unit ℝ]
 
-/--
--/
-structure ℝpos extends ℝ
-    := (is_pos : 0 < to_membership)
+    [has_squared_le_monotonic ℝ]
 
-/--
--/
-def ℝpos_one : ℭ.ℝpos
-    := ⟨1, ℭ.zero_lt_one⟩
+    [has_inv_mul_left_cancel_self ℝ]
 
-/--
--/
-instance ℝpos_has_one : has_one ℭ.ℝpos
-    := ⟨ℭ.ℝpos_one⟩
+    [has_le_nonneg_mul_preserves_left ℝ]
+    [has_le_nonneg_mul_preserves_right ℝ]
 
-/--
--/
-instance ℝpos_elem : has_coe ℭ.ℝpos ℂ
-    := ⟨λ z, z.elem⟩
+    [has_mul_assoc ℝ]
 
-/--
--/
-structure ℤpos extends ℤ
-    := (is_pos : 0 < to_membership)
+    [has_left_add_distributivity ℝ]
+    [has_right_add_distributivity ℝ]
 
-/--
--/
-def ℤpos_one : ℭ.ℤpos
-    := ⟨1, ℭ.zero_lt_one⟩
+    [has_sub_add_sub_cancel ℂ]
+    [has_add_sub_assoc ℂ]
+    [has_sub_cancel_to_zero ℂ]
+    [has_zero_right_add_cancel ℂ]
 
-/--
--/
-instance ℤpos_has_one : has_one ℭ.ℤpos
-    := ⟨ℭ.ℤpos_one⟩
+    [has_zero_right_add_cancel ℝ]
 
-/--
--/
-instance ℤpos_elem : has_coe ℭ.ℤpos ℂ
-    := ⟨λ z, z.elem⟩
+    (zero_lt_two : 0 < (2 : ℝ))
+    (one_le_two  : 1 ≤ (2 : ℝ))
 
-/--
--/
-structure ℝzero extends ℝ
-    := (is_ge_zero : 0 ≤ to_membership)
+    (abs_mul      : Π a b, |a * b| = |a| * |b|)
+    (abs_triangle : Π a b, |a + b| ≤ |a| + |b|)
 
-/--
--/
-instance ℝzero_has_zero : has_zero ℭ.ℝzero
-    := ⟨⟨0, begin repeat {sorry}, end⟩⟩
+    (z) (x : ℝ) (abs_x_le_half : |↑x| ≤ 2⁻¹) (one_minus_x_pos : 0 < 1 - x)
 
-/--
--/
-instance ℝzero_has_one : has_one ℭ.ℝzero
-    := ⟨⟨1, begin repeat {sorry}, end⟩⟩
+    : | ℭ.pow (1 - x) one_minus_x_pos z  - 1 | ≤ |↑x| * (4 * ℭ.real_exp (|z|) + 2 * |z|) :=
 
-/--
--/
-structure ℤzero extends ℤ
-    := (is_ge_zero : 0 ≤ to_membership)
+    begin
+        rw ← has_sub_add_sub_cancel.eq _ (↑(ℭ.real_log (1 - x) one_minus_x_pos) * z + 1) _,
 
-/--
--/
-instance ℤzero_has_zero : has_zero ℭ.ℤzero
-    := ⟨⟨0, begin repeat {sorry}, end⟩⟩
+        refine le_trans (abs_triangle _ _) _,
 
-/--
--/
-instance ℤzero_has_one : has_one ℭ.ℤzero
-    := ⟨⟨1, begin repeat {sorry}, end⟩⟩
+        rw has_add_sub_assoc.eq,
+        rw has_sub_cancel_to_zero.eq,
+        rw has_zero_right_add_cancel.eq,
+        rw abs_mul,
+        rw has_left_add_distributivity.eq,
+        rw ← has_mul_assoc.eq,
+
+        let log_bound
+            := ℭ.real_log_bound _ one_minus_x_pos abs_x_le_half,
+
+        let abs_x_inequality
+            := has_le_nonneg_mul_preserves_right.le (le_of_lt zero_lt_two) abs_x_le_half,
+
+        rw has_inv_mul_left_cancel_self.eq _ (ne_of_lt zero_lt_two).symm
+            at abs_x_inequality,
+
+        refine has_add_le_add.le
+            (le_trans
+                (ℭ.exp_linearization _ (le_trans log_bound abs_x_inequality) _)
+                (has_le_nonneg_mul_preserves_right.le
+                    (le_of_lt (ExpLog.exp_positive _ _))
+                    (le_trans
+                        (has_squared_le_monotonic.le (abs_nonneg _ _) log_bound) _))) _,
+
+        rw two_mul_lemma',
+        rw ← two_squares_is_four_lemma',
+
+        refine has_le_nonneg_mul_preserves_right.le _ _,
+
+        let zero_le_four
+            := has_add_le_add.le (le_of_lt zero_lt_two) (le_of_lt zero_lt_two),
+
+        rw has_zero_right_add_cancel.eq at zero_le_four,
+
+        refine zero_le_four,
+
+        have abs_x_le_one : |↑x| ≤ 1,
+        {
+            refine le_trans _ abs_x_inequality,
+
+            rw ← has_right_unit.eq (|↑x|),
+            rw has_mul_assoc.eq,
+            rw has_left_unit.eq,
+
+            refine has_le_nonneg_mul_preserves_left.le (abs_nonneg _ _) one_le_two,
+        },
+
+        let square_le_id
+            := has_le_nonneg_mul_preserves_right.le (abs_nonneg _ _) abs_x_le_one,
+
+        rw has_left_unit.eq at square_le_id,
+
+        refine square_le_id,
+
+        rw ← has_mul_assoc.eq,
+
+        refine has_le_nonneg_mul_preserves_right.le (abs_nonneg _ _) log_bound,
+    end
 
 end Complex --———————————————————————————————————————————————————————————————————————————--

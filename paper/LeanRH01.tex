@@ -1,0 +1,156 @@
+\documentclass[12pt,reqno]{amsart}
+
+\usepackage[final,color]{showkeys}
+\definecolor{refkey}{gray}{.85}
+\definecolor{labelkey}{gray}{.85}
+
+\usepackage{AKstyle}
+
+\numberwithin{equation}{section}
+
+\usepackage{caption}
+\usepackage[labelfont=rm]{subcaption}
+
+\usepackage[pagebackref=true, colorlinks]{hyperref}
+
+\hypersetup{pdffitwindow=true,linkcolor=blue,citecolor=blue,urlcolor=blue,menucolor=blue}
+
+\usepackage{comment}
+
+\begin{document}
+
+\author{Brandon Gomes}
+\thanks{Gomes is partially supported by}
+\email{bh.gomes@rutgers.edu}
+\address{Rutgers University, New Brunswick, NJ}
+
+\author{Alex Kontorovich}
+\thanks{Kontorovich is partially supported by}
+\email{alex.kontorovich@rutgers.edu}
+\address{Rutgers University, New Brunswick, NJ}
+
+\title[Formalizing the Riemann Hypothesis]{Formalizing the Riemann Hypothesis in the Lean Interactive Theorem Prover}
+
+\begin{abstract}
+Abstract
+\end{abstract}
+
+\date{\today}
+\maketitle
+\tableofcontents
+
+\section{Introduction}
+
+\subsection{Motivation}
+
+% TODO
+
+\subsection{Project Goals}
+
+% TODO
+
+\section{Construction}
+
+The simplest form of the Riemann Hypothesis we could construct is the following:
+\[
+    \forall\,(s : \mathbb{C}),\, 0 < \sigma \to \eta (s) = 0 \to \sigma = 2^{-1}
+\]
+where $\sigma := \Re(s)$ and $\eta$ is the Dirichlet Eta function typically defined as follows:
+\[
+    \eta(s) := \sum_{n\geq 1}\frac{(-1)^{n-1}}{n^s}
+\]
+Before proving that this series is well-defined, we want to define the Riemann Zeta function on $\mathbb{R}$:
+\[
+    \zeta(\sigma) := \sum_{n\geq 1}n^{-\sigma}
+\]
+To prove that this is a Cauchy sequence, we use the Cauchy-Schl\"omilch Condensation test so that we are comparing against the condensed sequence:
+\[
+    \sum_{n\geq 1}2^n(2^n)^{-\sigma}
+\]
+Simplifying each term, we get instead a geometric series in $2^{1-\sigma}$:
+\[
+    2^n(2^n)^{-\sigma} = (2 ^ n)^{1 - \sigma} = (2 ^ {1 - \sigma}) ^ n
+\]
+For this ratio to be less than $1$ we need that $\sigma > 1$ which gives us our domain of convergence.
+
+Now to prove that the Eta function converges, we collect terms in odd-even pairs as follows:
+\[
+    \eta(s) := \left(\frac{1}{1^s} - \frac{1}{2^s}\right) + \left(\frac{1}{3^s} - \frac{1}{4^s}\right) + \cdots
+\]
+For the $n$th term indexing from zero, we have,
+\[
+    \eta_n(s) := (2n+1)^{-s} - (2n+2)^{-s}
+\]
+To prove that the partial sums of this sequence are a Cauchy sequence, we compare is against the terms of the Zeta function evaluated at $1 + \sigma$,
+\[
+    \left|(2n+1)^{-s} - (2n+2)^{-s} \right| \leq C \cdot (n+1) ^ {-(1 + \sigma)}
+\]
+for some constant $C$ to be determined. Rewriting the left hand side, we get
+\[
+    \left| \frac{1 - (1 - \tfrac{1}{2n+2})^s}{(2n+1)^s} \right| \leq C\cdot(n+1)^{-(1+\sigma)}
+\]
+Since the absolute value of a power keeps only the real part of the exponent, we can cancel a factor of $(2n+1)^{-\sigma}$ from both sides,
+\[
+    \left|1 - (1 - \tfrac{1}{2n+2})^s\right| \leq C\cdot \frac{1}{n+1}
+\]
+We can sharpen the right side to $(2n+2)^{-1}$ to match the term on the left hand side, and we are left with the following inequality:
+\[
+    \left|1 - (1 - \tfrac{1}{2n+2})^s\right| \leq C\cdot \frac{1}{2n+2}
+\]
+Since this must be true for all $n$ and all of the functions are continuous as a function of $n$, we will assume the inequality holds for all positive real $x \leq 1/2$ and find the constant which makes this true.
+
+Opening up the power, we have
+\[
+    (1 - x)^s := \exp(\log(1 - x) \cdot s)
+\]
+Since $x \leq 2^{-1}$ we have the inequality $|\log(1 - x)| \leq 2|x|$. We also have the following inequality for $\exp$,
+\[
+    \forall z\forall s,\,\left|\exp(zs) - (1 + zs)\right| \leq \exp(|s|) |z|^2 
+\]
+We begin again at the target inequality and proceed as follows:
+\begin{align*}
+\left|1 - (1 - x) ^ s \right|
+    &= \left| 1 - \exp(\log(1 - x) \cdot s) \right| \\
+    &\leq \left| 1 - (1 + \log(1 - x) \cdot s) \right| \\
+    &+ \left| (1 + \log (1 - x) \cdot s) - \exp(\log(1 - x) \cdot s) \right| \\
+    &= \left|\log(1 - x)\right| \cdot |s| \\
+    &+ \left| \exp(\log(1 - x) \cdot s) - (1 + \log(1 - x)\cdot s)\right|
+\end{align*}
+Applying the $\exp$ inequality we get,
+\[
+    \left|1 - (1 - x)^s\right| \leq \left|\log(1 - x)\right|\cdot|s| + \exp(|s|) \cdot \left|\log(1 - x)\right|^2
+\]
+Applying the $\log$ inequality we get,
+\[
+    \left|1 - (1 - x)^s\right| \leq 2|x|\cdot|s| + 4\exp(|s|)|x|^2
+\]
+We weaken the right hand side factor of $|x|^2$ to $|x|$ since $|x| < 1$ and we have,
+\[
+    \left|1 - (1 - x)^s\right| \leq (2|s| + 4e^{|s|}) |x|
+\]
+so we have found our constant and the inequality is proved. From this fact we deduce that the Dirichlet Eta function converges for $\Re(s) > 0$.
+
+\section{Lean Details}
+
+Implementing this construction in the Lean Theorem Prover requires that we provide proofs of the Condensation Test, geometric series convergence, and the Comparison Test. 
+
+\subsection{Comparison Test}
+
+% TODO
+
+\subsection{Condensation Test}
+
+% TODO
+
+\subsection{Geometric Series Convergence}
+
+% TODO
+
+\newpage
+
+\bibliographystyle{alpha}
+
+\bibliography{AKbibliog}
+
+\end{document}
+
