@@ -74,13 +74,18 @@ class has_lift_mul_distributivity [has_lift_t α β] [has_mul α] [has_mul β]
     := (eq : Π x y : α, (↑(x * y) : β) = ↑x * ↑y)
 
 /--
+-/
+class has_lift_inv_comm [has_lift_t α β] [has_inv α] [has_inv β]
+    := (eq : Π a : α, (↑(a⁻¹) : β) = (↑a)⁻¹)
+
+/--
 AXIOM
 -/
 class has_right_unit [has_one α] [has_mul α]
     := (eq : Π a : α, a * 1 = a)
 
 /--
-provable ?
+AXIOM
 -/
 class has_left_unit [has_one α] [has_mul α]
     := (eq : Π a : α, 1 * a = a)
@@ -150,6 +155,12 @@ AXIOM
 -/
 class has_sub_cancel_to_zero [has_zero α] [has_sub α]
     := (eq : Π a : α, a - a = 0)
+
+/--
+AXIOM
+-/
+class has_mul_assoc [has_mul α]
+    := (eq : Π a b c : α, (a * b) * c = a * (b * c))
 
 /--
 -/
@@ -260,19 +271,13 @@ class has_sub_ne_zero_of_ne [has_zero α] [has_sub α]
 
 /--
 -/
+class has_lt_sub_neg [has_lt α] [has_zero α] [has_sub α]
+    := (lt : Π {a b : α}, a < b → a - b < 0)
+
+/--
+-/
 class has_zero_lt_one [has_lt α] [has_zero α] [has_one α]
     := (lt : 0 < (1 : α))
-
-/--
--/
-class has_zero_ne_one [has_zero α] [has_one α]
-    := (ne : 0 ≠ (1 : α))
-
-/--
-AXIOM
--/
-class has_mul_assoc [has_mul α]
-    := (eq : Π a b c : α, (a * b) * c = a * (b * c))
 
 /--
 -/
@@ -288,11 +293,6 @@ class has_nonneg_mul_nonneg_is_nonneg [has_le α] [has_zero α] [has_mul α]
 -/
 class has_squared_le_monotonic [has_le α] [has_zero α] [has_mul α]
     := (le : Π {a b : α}, 0 ≤ a → a ≤ b → a * a ≤ b * b)
-
-/--
--/
-class has_lt_sub_neg [has_lt α] [has_zero α] [has_sub α]
-    := (lt : Π {a b : α}, a < b → a - b < 0)
 
 /--
 -/
@@ -324,16 +324,6 @@ class has_right_inv_pos_lt [has_lt α] [has_zero α] [has_mul α] [has_inv α]
 -/
 class has_mul_pos [has_lt α] [has_zero α] [has_mul α]
     := (lt : Π {a b : α}, 0 < a → 0 < b → 0 < a * b)
-
-/--
--/
-class has_mul_ne_zero [has_zero α] [has_mul α]
-    := (ne : Π {a b : α}, a ≠ 0 → b ≠ 0 → a * b ≠ 0)
-
-/--
--/
-class has_inv_ne_zero [has_zero α] [has_inv α]
-    := (ne : Π {a : α}, a ≠ 0 → a⁻¹ ≠ 0)
 
 /--
 -/
@@ -828,6 +818,19 @@ def zero_lt_one
         rw one_is_lifted_one_lemma nat α,
         refine nat.lift.succ_pos α _,
     end
+
+/--
+-/
+instance zero_lt_one_instance
+    [has_lt α]
+    [has_zero α]
+    [has_one α]
+    [has_lift_t nat α]
+    [has_same_lifted_zero nat α]
+    [has_same_lifted_one nat α]
+    [has_lift_lt_preserved nat α]
+    : has_zero_lt_one α
+    := ⟨zero_lt_one α⟩
 
 end lift --——————————————————————————————————————————————————————————————————————————————--
 end nat --———————————————————————————————————————————————————————————————————————————————--

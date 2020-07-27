@@ -11,30 +11,31 @@ import .riemann_zeta
 /-!
 -/
 
-namespace dirichlet_eta --———————————————————————————————————————————————————————————————--
+--———————————————————————————————————————————————————————————————————————————————————————--
 variables {ℂ : Type*} {ℝ : Type*}
           [has_lift_t nat ℝ] [has_lift_t ℝ ℂ] [preorder ℝ] [Algebra ℝ] [Algebra ℂ]
           (ℭ : Complex ℂ ℝ)
 
-local notation `|` z `|` := ℭ.abs z
+namespace dirichlet_eta --———————————————————————————————————————————————————————————————--
 
 /--
 -/
-def term
+def term_pair
     [has_same_lifted_zero ℕ ℝ]
     [has_lift_lt_preserved ℕ ℝ]
     (s n)
-    := ℭ.pow ↑(nat.succ           (2 * n))  (nat.lift.succ_pos ℝ _) (-s)
-     - ℭ.pow ↑(nat.succ (nat.succ (2 * n))) (nat.lift.succ_pos ℝ _) (-s)
+    := riemann_zeta.term ℭ.pow s (2 * n) - riemann_zeta.term ℭ.pow s (2 * n).succ
+
+namespace term_pair --———————————————————————————————————————————————————————————————————--
 
 /--
 -/
-def term.riemann_zeta_bound (s)
-    := 4 * ℭ.real_exp (|s|) + 3 * ℭ.abs s
+def riemann_zeta_bound (s)
+    := ↑4 * ℭ.real_exp (ℭ.abs s) + ↑3 * ℭ.abs s
 
 /--
 -/
-def term.riemann_zeta_bound.positive
+def riemann_zeta_bound.positive
     [has_zero_left_absorb ℝ]
     [has_nonneg_mul_nonneg_is_nonneg ℝ]
     [has_lt_add_of_le_of_pos ℝ]
@@ -47,27 +48,16 @@ def term.riemann_zeta_bound.positive
 
     (s)
 
-    : 0 < term.riemann_zeta_bound ℭ s :=
+    : 0 < riemann_zeta_bound ℭ s :=
 
     begin
-        have zero_lt_three : (0 : ℝ) < 3,
-        {
-            rw three_is_lifted_three_lemma ℕ ℝ,
-            refine nat.lift.succ_pos ℝ _,
-        },
-
-        have zero_lt_four : (0 : ℝ) < 4,
-        {
-            rw four_is_lifted_four_lemma ℕ ℝ,
-            refine nat.lift.succ_pos ℝ _,
-        },
-
         refine has_lt_add_of_le_of_pos.lt _
-            (has_nonneg_mul_nonneg_is_nonneg.le (le_of_lt zero_lt_three) (ℭ.abs_nonneg _)),
+            (has_nonneg_mul_nonneg_is_nonneg.le
+                (le_of_lt (nat.lift.succ_pos ℝ _)) (ℭ.abs_nonneg _)),
 
         let four_exponentials_are_positive
             := has_lt_pos_mul_preserves_right.lt
-                (ℭ.real_explog.exp_positive _) zero_lt_four,
+                (ℭ.real_explog.exp_positive _) (nat.lift.succ_pos ℝ _),
 
         rw has_zero_left_absorb.eq at four_exponentials_are_positive,
 
@@ -76,7 +66,7 @@ def term.riemann_zeta_bound.positive
 
 /--
 -/
-def term.riemann_zeta_bound.abs_positive
+def riemann_zeta_bound.abs_positive
     [has_zero_left_absorb ℝ]
     [has_nonneg_mul_nonneg_is_nonneg ℝ]
     [has_lt_add_of_le_of_pos ℝ]
@@ -87,20 +77,20 @@ def term.riemann_zeta_bound.abs_positive
     [has_lift_add_distributivity ℕ ℝ]
     [has_lift_lt_preserved ℕ ℝ]
 
-    (ge_zero_to_abs : Π z, 0 ≤ z → |↑z| = z)
+    (ge_zero_to_abs : Π z, 0 ≤ z → ℭ.abs ↑z = z)
 
     (s)
 
-    : 0 < ℭ.abs ↑(term.riemann_zeta_bound ℭ s)
+    : 0 < ℭ.abs ↑(riemann_zeta_bound ℭ s)
 
     := begin
-        rw ge_zero_to_abs _ (le_of_lt (term.riemann_zeta_bound.positive ℭ s)),
-        refine term.riemann_zeta_bound.positive ℭ _,
+        rw ge_zero_to_abs _ (le_of_lt (riemann_zeta_bound.positive ℭ _)),
+        refine riemann_zeta_bound.positive ℭ _,
     end
 
 /--
 -/
-def term.bounded_by_riemann_zeta
+def bounded_by_riemann_zeta
     [has_add_le_add ℝ]
     [has_inv_mul_left_cancel_self ℝ]
     [has_inv_mul_reverse ℝ]
@@ -126,8 +116,6 @@ def term.bounded_by_riemann_zeta
     [has_zero_right_absorb ℝ]
     [has_zero_right_add_cancel ℝ]
     [has_zero_sub_is_neg ℝ]
-    [has_inv_ne_zero ℝ]
-    [has_mul_ne_zero ℝ]
     [has_mul_pos ℝ]
     [has_inv_pos ℝ]
 
@@ -157,17 +145,18 @@ def term.bounded_by_riemann_zeta
     (abs_mul        : Π a b, ℭ.abs (a * b) = ℭ.abs (a) * ℭ.abs (b))
     (abs_sub        : Π a b, ℭ.abs (a - b) = ℭ.abs (b - a))
     (abs_inv        : Π z, ℭ.abs (z⁻¹) = (ℭ.abs z)⁻¹)
-    (abs_triangle   : Π a b, ℭ.abs (a + b) ≤ ℭ.abs a + ℭ.abs b)
+    (abs_add        : Π a b, ℭ.abs (a + b) ≤ ℭ.abs a + ℭ.abs b)
     (ge_zero_to_abs : Π x, 0 ≤ x → ℭ.abs ↑x = x)
 
     (s n)
 
-    : ℭ.abs (term ℭ s n)
+    : ℭ.abs (term_pair ℭ s n)
         ≤ riemann_zeta.term.on_reals ℭ.real_explog (1 + ℭ.real_part s) (2 * n)
-        * term.riemann_zeta_bound ℭ s :=
+        * riemann_zeta_bound ℭ s :=
 
     begin
-        rw [term, riemann_zeta.term.on_reals],
+        rw [term_pair, riemann_zeta.term.on_reals],
+        rw [riemann_zeta.term, riemann_zeta.term, riemann_zeta.term],
         rw [← has_zero_sub_is_neg.eq, ← has_zero_sub_is_neg.eq],
         rw ExpLog.pow_neg_exponent_inverts,
         rw ExpLog.pow_homomorphism,
@@ -217,7 +206,7 @@ def term.bounded_by_riemann_zeta
             _ (by rw mul_inv_add_one_lemma),
 
         refine le_trans _
-            (has_le_pos_mul_preserves_right.le (term.riemann_zeta_bound.positive _ _)
+            (has_le_pos_mul_preserves_right.le (riemann_zeta_bound.positive _ _)
             (has_inv_reverses_le.le (le_of_lt (has_lift_lt_preserved.lt
                 (nat.lt_succ_self _))))),
 
@@ -228,10 +217,10 @@ def term.bounded_by_riemann_zeta
             (has_inv_pos.lt (nat.lift.succ_pos ℝ _)),
 
         rw abs_sub,
-        rw term.riemann_zeta_bound,
+        rw riemann_zeta_bound,
         rw has_left_add_distributivity.eq,
 
-        refine le_trans (Complex.one_minus_pow_bound _ _ _ abs_mul abs_triangle _ _ _ _) _,
+        refine le_trans (Complex.one_minus_pow_bound _ _ _ abs_mul abs_add _ _ _ _) _,
 
         rw two_is_lifted_two_lemma ℕ ℝ,
 
@@ -251,20 +240,32 @@ def term.bounded_by_riemann_zeta
         rw remove_abs,
         rw ← has_left_add_distributivity.eq,
 
+        rw four_is_lifted_four_lemma ℕ ℝ,
+        rw ← two_mul_lemma,
+
         refine has_le_nonneg_mul_preserves_left.le
             Kinv_ge_zero
             (has_add_le_add.le
                 (le_refl _) (has_le_nonneg_mul_preserves_right.le (ℭ.abs_nonneg _) _)),
 
-        rw three_is_lifted_three_lemma ℕ ℝ,
         rw two_is_lifted_two_lemma ℕ ℝ,
 
         refine has_lift_le_preserved.le (le_of_lt (nat.lt_succ_self _)),
     end
 
+end term_pair --—————————————————————————————————————————————————————————————————————————--
+
 /--
 -/
-def partial.is_cauchy
+def partial_pairs
+    [has_lift_lt_preserved ℕ ℝ]
+    [has_same_lifted_zero ℕ ℝ]
+    (s)
+    := partial_sum (term_pair ℭ s)
+
+/--
+-/
+def partial_pairs.is_cauchy
     [has_add_le_add ℝ]
     [has_add_left_lt ℝ]
     [has_add_lt_add ℝ]
@@ -308,13 +309,9 @@ def partial.is_cauchy
     [has_zero_right_absorb ℝ]
     [has_zero_right_add_cancel ℝ]
     [has_zero_sub_is_neg ℝ]
-    [has_inv_ne_zero ℝ]
-    [has_mul_ne_zero ℝ]
-    [has_zero_ne_one ℝ]
     [has_mul_pos ℝ]
     [has_inv_pos ℝ]
     [has_sub_pos ℝ]
-    [has_zero_lt_one ℝ]
 
     [has_lift_add_distributivity nat ℝ]
     [has_lift_le_preserved nat ℝ]
@@ -338,42 +335,73 @@ def partial.is_cauchy
     [has_zero_right_add_cancel ℂ]
     [has_zero_sub_is_neg ℂ]
 
+    [has_same_lifted_zero ℝ ℂ]
+    [has_same_lifted_one ℝ ℂ]
+    [has_lift_add_distributivity ℝ ℂ]
     [has_lift_sub_distributivity ℝ ℂ]
+    [has_lift_mul_distributivity ℝ ℂ]
+    [has_lift_inv_comm ℝ ℂ]
 
-    (abs_zeroℂ abs_mulℂ abs_subℂ abs_invℂ abs_triangleℂ abs_nonnegℂ)
-    (abs_zero abs_one abs_triangle abs_sub abs_mul abs_inv abs_nonneg)
+    (abs_zero abs_one)
+    (abs_add : Π w z, ℭ.abs (w + z) ≤ ℭ.abs w + ℭ.abs z)
+    (abs_sub : Π w z, ℭ.abs (w - z) = ℭ.abs (z - w))
+    (abs_mul : Π w z, ℭ.abs (w * z) = ℭ.abs w * ℭ.abs z)
+    (abs_inv : Π z, ℭ.abs (z⁻¹) = (ℭ.abs z)⁻¹)
+    (abs_ge_zero)
 
-    (pos_to_abs abs_mono)
+    (pos_to_absℝ abs_monoℝ)
 
     (half ceil)
 
     (s) (σpos : 0 < ℭ.real_part s)
 
-    : is_cauchy ℭ.abs (partial_sum (term ℭ s)) :=
+    : is_cauchy ℭ.abs (partial_pairs ℭ s) :=
 
     begin
         let one_plus_σ_gt_one := has_add_left_lt.lt _ _ 1 σpos,
 
         rw has_zero_right_add_cancel.eq at one_plus_σ_gt_one,
 
-        refine is_cauchy.comparison _ pos_to_abs _
-            abs_zeroℂ abs_triangleℂ abs_nonnegℂ _ _
-                (term.bounded_by_riemann_zeta _
-                    abs_mulℂ abs_subℂ abs_invℂ abs_triangleℂ pos_to_abs _)
-                (is_cauchy.closed.partial_sum_right_mul _ abs_mul _ _
-                    (term.riemann_zeta_bound.abs_positive _ pos_to_abs _)
-                    (is_cauchy.closed.scaled_sequence_partial_sum _ abs_mono _
-                        (riemann_zeta.term.on_reals.nonneg _ _) _ (nat.zero_lt_one_add _)
-                        (riemann_zeta.partial.on_reals.is_cauchy _ _
-                            abs_zero abs_one abs_triangle abs_sub abs_mul abs_inv
-                            abs_nonneg pos_to_abs half ceil _
-                            one_plus_σ_gt_one))),
-    end
+        have abs_zeroℝ : ℭ.abs ↑(0 : ℝ) = 0,
+            rw has_same_lifted_zero.eq,
+            refine abs_zero,
 
-/- TODO:
-def cauchy_sequence (s σpos) : CauchySequence ℭ.abs
-    := { sequence  := partial ℭ.pow s,
-         condition := partial.is_cauchy ℭ s σpos }
--/
+        have abs_oneℝ : ℭ.abs ↑(1 : ℝ) = 1,
+            rw has_same_lifted_one.eq,
+            refine abs_one,
+
+        have abs_addℝ : Π x y : ℝ, ℭ.abs ↑(x + y) ≤ ℭ.abs ↑x + ℭ.abs ↑y,
+            intros,
+            rw has_lift_add_distributivity.eq,
+            refine abs_add _ _,
+
+        have abs_subℝ : Π x y : ℝ, ℭ.abs ↑(x - y) = ℭ.abs ↑(y - x),
+            intros,
+            rw [has_lift_sub_distributivity.eq, has_lift_sub_distributivity.eq],
+            refine abs_sub _ _,
+
+        have abs_mulℝ : Π x y : ℝ, ℭ.abs ↑(x * y) = ℭ.abs ↑x * ℭ.abs ↑y,
+            intros,
+            rw has_lift_mul_distributivity.eq,
+            refine abs_mul _ _,
+
+        have abs_invℝ : Π x : ℝ, ℭ.abs ↑(x⁻¹) = (ℭ.abs ↑x)⁻¹,
+            intros,
+            rw has_lift_inv_comm.eq,
+            refine abs_inv _,
+
+        refine is_cauchy.comparison _ pos_to_absℝ _ abs_zero abs_add abs_ge_zero _ _
+            (term_pair.bounded_by_riemann_zeta _
+                abs_mul abs_sub abs_inv abs_add pos_to_absℝ _)
+            (is_cauchy.closed.partial_sum_right_mul _ abs_mulℝ _ _
+                (term_pair.riemann_zeta_bound.abs_positive _ pos_to_absℝ _)
+                (is_cauchy.closed.scaled_sequence_partial_sum _ abs_monoℝ _
+                    (riemann_zeta.term.on_reals.nonneg _ _) _ (nat.zero_lt_one_add _)
+                    (riemann_zeta.partial.on_reals.is_cauchy _ _
+                        abs_zeroℝ abs_oneℝ abs_addℝ abs_subℝ abs_mulℝ abs_invℝ
+                        (λ _, abs_ge_zero _) pos_to_absℝ
+                        half ceil _
+                        one_plus_σ_gt_one))),
+    end
 
 end dirichlet_eta --—————————————————————————————————————————————————————————————————————--

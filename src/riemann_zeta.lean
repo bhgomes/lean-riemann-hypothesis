@@ -15,6 +15,19 @@ variables {ℝ : Type*}
           [has_lift_t nat ℝ] [preorder ℝ] [has_zero ℝ] [has_one ℝ]
           [has_neg ℝ] [has_add ℝ] [has_sub ℝ] [has_mul ℝ] [has_inv ℝ]
 
+/--
+-/
+def term {α β γ}
+    [has_zero α]
+    [has_lt α]
+    [has_lift_t nat α]
+    [has_same_lifted_zero nat α]
+    [has_lift_lt_preserved nat α]
+    [has_neg β]
+    (pow : Π a : α, 0 < a → β → γ)
+    (s n)
+    := pow ↑(nat.succ n) (nat.lift.succ_pos α _) (-s)
+
 namespace term --——————————————————————————————————————————————————————————————————————————--
 
 /--
@@ -27,7 +40,7 @@ def on_reals
     [has_lift_lt_preserved nat ℝ]
     (ℯ : ExpLog ℝ ℝ)
     (σ n)
-    := ℯ.pow ↑(nat.succ n) (nat.lift.succ_pos ℝ _) (-σ)
+    := term ℯ.pow σ n
 
 /--
 -/
@@ -56,7 +69,7 @@ def on_reals.non_increasing
     begin
         intros _,
 
-        rw [on_reals, on_reals],
+        rw [on_reals, on_reals, term, term],
         rw ← has_zero_sub_is_neg.eq,
         rw [ExpLog.pow_neg_exponent_inverts, ExpLog.pow_neg_exponent_inverts],
 
@@ -73,8 +86,6 @@ def on_reals.rewrite.pow_reduction
     [has_right_add_distributivity ℝ]
     [has_left_sub_distributivity ℝ]
 
-    [has_zero_ne_one ℝ]
-    [has_mul_ne_zero ℝ]
     [has_left_unit ℝ]
     [has_right_unit ℝ]
 
@@ -83,7 +94,6 @@ def on_reals.rewrite.pow_reduction
 
     [has_zero_sub_is_neg ℝ]
 
-    [has_zero_lt_one ℝ]
     [has_mul_pos ℝ]
 
     [has_same_lifted_one nat ℝ]
@@ -107,7 +117,7 @@ def on_reals.rewrite.pow_reduction
             rw one_is_lifted_one_lemma ℕ ℝ,
             refine has_lift_le_preserved.le (nat.pow_two_ge_one _),
 
-        rw on_reals,
+        rw [on_reals, term],
         rw ← ℯ.pow_id_at_one ↑(_) (lifted_pow2_pos _),
 
         rw ExpLog.pow_domain_irrel _
@@ -120,7 +130,7 @@ def on_reals.rewrite.pow_reduction
             rw has_same_lifted_zero.eq,
             rw ExpLog.pow_homomorphism_zero,
 
-            rw ExpLog.pow_domain_irrel _ ↑(2 ^ 0) _ (1 : ℝ) (has_zero_lt_one.lt) _
+            rw ExpLog.pow_domain_irrel _ ↑(2 ^ 0) _ (1 : ℝ) _ _
                 (by rw [nat.pow_zero, has_same_lifted_one.eq]),
 
             rw ExpLog.pow_homomorphism_one,
@@ -197,11 +207,8 @@ def partial.on_reals.is_cauchy
     [has_zero_sub_is_neg ℝ]
     [has_inv_reverses_lt ℝ]
     [has_lt_pos_mul_preserves_right ℝ]
-    [has_zero_ne_one ℝ]
-    [has_mul_ne_zero ℝ]
     [has_mul_pos ℝ]
     [has_sub_pos ℝ]
-    [has_zero_lt_one ℝ]
 
     (ℯ : ExpLog ℝ ℝ)
 

@@ -45,7 +45,7 @@ structure Complex
                                       ≤ (abs x * abs x) * real_explog.exp (abs z))
        (real_log_bound           : Π x (p : 0 < 1 - x), abs ↑x ≤ 2⁻¹
                                       → abs ↑(real_explog.log (1 - x) p)
-                                      ≤ abs ↑x * 2)
+                                      ≤ abs ↑x + abs ↑x)
 
 namespace Complex --—————————————————————————————————————————————————————————————————————--
 variables {ℂ ℝ} (ℭ : Complex ℂ ℝ)
@@ -119,6 +119,8 @@ local notation `|` z `|` := ℭ.abs z
 /--
 -/
 def one_minus_pow_bound
+    [has_lift_t ℕ ℝ]
+
     [has_add_le_add ℝ]
 
     [has_left_unit ℝ]
@@ -126,7 +128,7 @@ def one_minus_pow_bound
 
     [has_squared_le_monotonic ℝ]
 
-    [has_inv_mul_left_cancel_self ℝ]
+    [has_inv_mul_right_cancel_self ℝ]
 
     [has_le_nonneg_mul_preserves_left ℝ]
     [has_le_nonneg_mul_preserves_right ℝ]
@@ -151,7 +153,7 @@ def one_minus_pow_bound
 
     (z) (x : ℝ) (abs_x_le_half : |↑x| ≤ 2⁻¹) (one_minus_x_pos : 0 < 1 - x)
 
-    : | ℭ.pow (1 - x) one_minus_x_pos z  - 1 | ≤ |↑x| * (4 * ℭ.real_exp (|z|) + 2 * |z|) :=
+    : | ℭ.pow (1 - x) one_minus_x_pos z  - 1 | ≤ |↑x| * (4 * ℭ.real_exp (|z|) + (|z| + |z|)) :=
 
     begin
         rw ← has_sub_add_sub_cancel.eq _ (↑(ℭ.real_log (1 - x) one_minus_x_pos) * z + 1) _,
@@ -169,10 +171,12 @@ def one_minus_pow_bound
             := ℭ.real_log_bound _ one_minus_x_pos abs_x_le_half,
 
         let abs_x_inequality
-            := has_le_nonneg_mul_preserves_right.le (le_of_lt zero_lt_two) abs_x_le_half,
+            := has_le_nonneg_mul_preserves_left.le (le_of_lt zero_lt_two) abs_x_le_half,
 
-        rw has_inv_mul_left_cancel_self.eq _ (ne_of_lt zero_lt_two).symm
+        rw has_inv_mul_right_cancel_self.eq _ (ne_of_lt zero_lt_two).symm
             at abs_x_inequality,
+
+        rw two_mul_lemma at abs_x_inequality,
 
         refine has_add_le_add.le
             (le_trans
@@ -182,7 +186,6 @@ def one_minus_pow_bound
                     (le_trans
                         (has_squared_le_monotonic.le (abs_nonneg _ _) log_bound) _))) _,
 
-        rw two_mul_lemma',
         rw ← two_squares_is_four_lemma',
 
         refine has_le_nonneg_mul_preserves_right.le _ _,
@@ -198,6 +201,7 @@ def one_minus_pow_bound
         {
             refine le_trans _ abs_x_inequality,
 
+            rw ← two_mul_lemma',
             rw ← has_right_unit.eq (|↑x|),
             rw has_mul_assoc.eq,
             rw has_left_unit.eq,
@@ -212,7 +216,8 @@ def one_minus_pow_bound
 
         refine square_le_id,
 
-        rw ← has_mul_assoc.eq,
+        rw has_left_add_distributivity.eq,
+        rw ← has_right_add_distributivity.eq,
 
         refine has_le_nonneg_mul_preserves_right.le (abs_nonneg _ _) log_bound,
     end
