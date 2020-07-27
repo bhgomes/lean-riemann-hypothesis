@@ -60,17 +60,17 @@ class has_right_sub_distributivity [has_sub α] [has_mul α]
 
 /--
 -/
-class has_lift_add_distributivity [has_lift_t α β] [has_add α] [has_add β]
+class has_lift_add_comm [has_lift_t α β] [has_add α] [has_add β]
     := (eq : Π x y : α, (↑(x + y) : β) = ↑x + ↑y)
 
 /--
 -/
-class has_lift_sub_distributivity [has_lift_t α β] [has_sub α] [has_sub β]
+class has_lift_sub_comm [has_lift_t α β] [has_sub α] [has_sub β]
     := (eq : Π x y : α, (↑(x - y) : β) = ↑x - ↑y)
 
 /--
 -/
-class has_lift_mul_distributivity [has_lift_t α β] [has_mul α] [has_mul β]
+class has_lift_mul_comm [has_lift_t α β] [has_mul α] [has_mul β]
     := (eq : Π x y : α, (↑(x * y) : β) = ↑x * ↑y)
 
 /--
@@ -119,23 +119,23 @@ class has_add_nonneg [has_le α] [has_zero α] [has_add α]
 
 /--
 -/
-class has_zero_left_absorb [has_zero α] [has_mul α]
+class has_zero_mul_is_zero [has_zero α] [has_mul α]
     := (eq : Π a : α, 0 * a = 0)
 
 /--
 AXIOM
 -/
-class has_zero_right_absorb [has_zero α] [has_mul α]
+class has_mul_zero_is_zero [has_zero α] [has_mul α]
     := (eq : Π a : α, a * 0 = 0)
 
 /--
 -/
-class has_same_lifted_zero [has_lift_t α β] [has_zero α] [has_zero β]
+class has_lift_zero_same [has_lift_t α β] [has_zero α] [has_zero β]
     := (eq : ↑(0 : α) = (0 : β))
 
 /--
 -/
-class has_same_lifted_one [has_lift_t α β] [has_one α] [has_one β]
+class has_lift_one_same [has_lift_t α β] [has_one α] [has_one β]
     := (eq : ↑(1 : α) = (1 : β))
 
 /--
@@ -153,7 +153,7 @@ class has_zero_left_add_cancel [has_zero α] [has_add α]
 /--
 AXIOM
 -/
-class has_sub_cancel_to_zero [has_zero α] [has_sub α]
+class has_sub_self_is_zero [has_zero α] [has_sub α]
     := (eq : Π a : α, a - a = 0)
 
 /--
@@ -199,17 +199,17 @@ class has_le_nonneg_mul_preserves_right [has_lt α] [has_le α] [has_zero α] [h
 
 /--
 -/
-class has_lift_le_preserved [has_lift_t α β] [has_le α] [has_le β]
+class has_lift_le_comm [has_lift_t α β] [has_le α] [has_le β]
     := (le : Π {x y : α}, x ≤ y → ↑x ≤ (↑y : β))
 
 /--
 -/
-class has_lift_lt_preserved [has_lift_t α β] [has_lt α] [has_lt β]
+class has_lift_lt_comm [has_lift_t α β] [has_lt α] [has_lt β]
     := (lt : Π {x y : α}, x < y → ↑x < (↑y : β))
 
 /--
 -/
-class has_lift_ne_preserved [has_lift_t α β]
+class has_lift_ne_comm [has_lift_t α β]
     := (ne : Π {x y : α}, x ≠ y → ↑x ≠ (↑y : β))
 
 /--
@@ -424,10 +424,10 @@ def mul_inv_add_one_lemma
     [has_left_unit α]
     [has_inv_mul_right_cancel_self α]
     [has_right_sub_distributivity α]
-    [has_same_lifted_zero nat α]
-    [has_same_lifted_one nat α]
-    [has_lift_sub_distributivity nat α]
-    [has_lift_ne_preserved nat α]
+    [has_lift_zero_same nat α]
+    [has_lift_one_same nat α]
+    [has_lift_sub_comm nat α]
+    [has_lift_ne_comm nat α]
     (n : nat)
     : (↑n : α) * (↑n.succ)⁻¹ = 1 - (↑n.succ)⁻¹ :=
     begin
@@ -435,8 +435,8 @@ def mul_inv_add_one_lemma
 
         have succ_non_zero : ↑n.succ ≠ (0 : α),
             rw (_ : 0 = (↑0 : α)),
-            refine has_lift_ne_preserved.ne (nat.succ_ne_zero _),
-            rw has_same_lifted_zero.eq,
+            refine has_lift_ne_comm.ne (nat.succ_ne_zero _),
+            rw has_lift_zero_same.eq,
 
         rw ← has_inv_mul_right_cancel_self.eq _ succ_non_zero,
         rw ← has_right_sub_distributivity.eq,
@@ -445,9 +445,9 @@ def mul_inv_add_one_lemma
 
         rw (_ : 1 = (↑1 : α)),
 
-        rw ← has_lift_sub_distributivity.eq,
+        rw ← has_lift_sub_comm.eq,
         rw nat.succ_sub_one,
-        rw has_same_lifted_one.eq,
+        rw has_lift_one_same.eq,
     end
 
 /--
@@ -548,8 +548,8 @@ def nat_mul_commute_lemma
     [has_add α]
     [has_mul α]
 
-    [has_zero_left_absorb α]
-    [has_zero_right_absorb α]
+    [has_zero_mul_is_zero α]
+    [has_mul_zero_is_zero α]
 
     [has_right_unit α]
     [has_left_unit α]
@@ -558,9 +558,9 @@ def nat_mul_commute_lemma
     [has_right_add_distributivity α]
 
     [has_lift_t nat α]
-    [has_same_lifted_zero nat α]
-    [has_same_lifted_one nat α]
-    [has_lift_add_distributivity nat α]
+    [has_lift_zero_same nat α]
+    [has_lift_one_same nat α]
+    [has_lift_add_comm nat α]
 
     (a : α) (n : nat)
 
@@ -568,15 +568,15 @@ def nat_mul_commute_lemma
 
     begin
         induction n with n hn,
-            rw has_same_lifted_zero.eq,
-            rw has_zero_left_absorb.eq,
-            rw has_zero_right_absorb.eq,
+            rw has_lift_zero_same.eq,
+            rw has_zero_mul_is_zero.eq,
+            rw has_mul_zero_is_zero.eq,
             rw nat.succ_eq_add_one,
-            rw has_lift_add_distributivity.eq,
+            rw has_lift_add_comm.eq,
             rw has_left_add_distributivity.eq,
             rw has_right_add_distributivity.eq,
             rw hn,
-            rw has_same_lifted_one.eq,
+            rw has_lift_one_same.eq,
             rw has_left_unit.eq,
             rw has_right_unit.eq,
     end
@@ -587,30 +587,30 @@ variables (α β)
 /--
 -/
 def zero_is_lifted_zero_lemma
-    [has_zero α] [has_zero β] [has_lift_t α β] [has_same_lifted_zero α β]
+    [has_zero α] [has_zero β] [has_lift_t α β] [has_lift_zero_same α β]
     : (0 : β) = ↑(0 : α)
-    := by rw has_same_lifted_zero.eq
+    := by rw has_lift_zero_same.eq
 
 --———————————————————————————————————————————————————————————————————————————————————————--
-variables [has_one α] [has_one β] [has_lift_t α β] [has_same_lifted_one α β]
+variables [has_one α] [has_one β] [has_lift_t α β] [has_lift_one_same α β]
 
 /--
 -/
 def one_is_lifted_one_lemma
     : (1 : β) = ↑(1 : α)
-    := by rw has_same_lifted_one.eq
+    := by rw has_lift_one_same.eq
 
 --———————————————————————————————————————————————————————————————————————————————————————--
-variables [has_add α] [has_add β] [has_lift_add_distributivity α β]
+variables [has_add α] [has_add β] [has_lift_add_comm α β]
 
 /--
 -/
 def two_is_lifted_two_lemma : (2 : β) = ↑(2 : α) :=
     begin
         rw (_ : (2 : β) = ↑(1 : α) + ↑(1 : α)),
-        rw ← has_lift_add_distributivity.eq,
+        rw ← has_lift_add_comm.eq,
         refine rfl,
-        rw has_same_lifted_one.eq,
+        rw has_lift_one_same.eq,
         refine rfl,
     end
 
@@ -619,9 +619,9 @@ def two_is_lifted_two_lemma : (2 : β) = ↑(2 : α) :=
 def three_is_lifted_three_lemma : (3 : β) = ↑(3 : α) :=
     begin
         rw (_ : (3 : β) = ↑(1 : α) + ↑(1 : α) + ↑(1 : α)),
-        rw [← has_lift_add_distributivity.eq, ← has_lift_add_distributivity.eq],
+        rw [← has_lift_add_comm.eq, ← has_lift_add_comm.eq],
         refine rfl,
-        rw has_same_lifted_one.eq,
+        rw has_lift_one_same.eq,
         refine rfl,
     end
 
@@ -630,9 +630,9 @@ def three_is_lifted_three_lemma : (3 : β) = ↑(3 : α) :=
 def four_is_lifted_four_lemma : (4 : β) = ↑(4 : α) :=
     begin
         rw (_ : (4 : β) = ↑(1 : α) + ↑(1 : α) + (↑(1 : α) + ↑(1 : α))),
-        rw [← has_lift_add_distributivity.eq, ← has_lift_add_distributivity.eq],
+        rw [← has_lift_add_comm.eq, ← has_lift_add_comm.eq],
         refine rfl,
-        rw has_same_lifted_one.eq,
+        rw has_lift_one_same.eq,
         refine rfl,
     end
 
@@ -782,13 +782,13 @@ def succ_pos
     [has_lt α]
     [has_zero α]
     [has_lift_t nat α]
-    [has_same_lifted_zero nat α]
-    [has_lift_lt_preserved nat α]
+    [has_lift_zero_same nat α]
+    [has_lift_lt_comm nat α]
     (n : nat)
     : 0 < (↑n.succ : α) :=
     begin
         rw zero_is_lifted_zero_lemma ℕ α,
-        refine has_lift_lt_preserved.lt (nat.succ_pos _),
+        refine has_lift_lt_comm.lt (nat.succ_pos _),
     end
 
 /--
@@ -797,8 +797,8 @@ def succ_nonzero
     [preorder α]
     [has_zero α]
     [has_lift_t nat α]
-    [has_same_lifted_zero nat α]
-    [has_lift_lt_preserved nat α]
+    [has_lift_zero_same nat α]
+    [has_lift_lt_comm nat α]
     (n : nat)
     : (↑n.succ : α) ≠ 0
     := (ne_of_gt (nat.lift.succ_pos α _))
@@ -810,9 +810,9 @@ def zero_lt_one
     [has_zero α]
     [has_one α]
     [has_lift_t nat α]
-    [has_same_lifted_zero nat α]
-    [has_same_lifted_one nat α]
-    [has_lift_lt_preserved nat α]
+    [has_lift_zero_same nat α]
+    [has_lift_one_same nat α]
+    [has_lift_lt_comm nat α]
     : (0 : α) < 1 :=
     begin
         rw one_is_lifted_one_lemma nat α,
@@ -826,9 +826,9 @@ instance zero_lt_one_instance
     [has_zero α]
     [has_one α]
     [has_lift_t nat α]
-    [has_same_lifted_zero nat α]
-    [has_same_lifted_one nat α]
-    [has_lift_lt_preserved nat α]
+    [has_lift_zero_same nat α]
+    [has_lift_one_same nat α]
+    [has_lift_lt_comm nat α]
     : has_zero_lt_one α
     := ⟨zero_lt_one α⟩
 
@@ -1021,7 +1021,7 @@ def partial_sum.preserve_nonneg
 /--
 -/
 def partial_sum.left_mul_commute
-    [has_mul α] [has_zero_right_absorb α] [has_left_add_distributivity α]
+    [has_mul α] [has_mul_zero_is_zero α] [has_left_add_distributivity α]
     (seq : nat → α)
     (C)
     : partial_sum (λ k, C * seq k) = λ n, C * partial_sum seq n :=
@@ -1031,7 +1031,7 @@ def partial_sum.left_mul_commute
         induction n with n hn,
             rw partial_sum,
             rw partial_sum,
-            rw has_zero_right_absorb.eq,
+            rw has_mul_zero_is_zero.eq,
             rw partial_sum,
             rw partial_sum,
             rw hn,
@@ -1041,7 +1041,7 @@ def partial_sum.left_mul_commute
 /--
 -/
 def partial_sum.right_mul_commute
-    [has_mul α] [has_zero_left_absorb α] [has_right_add_distributivity α]
+    [has_mul α] [has_zero_mul_is_zero α] [has_right_add_distributivity α]
     (seq : nat → α)
     (C)
     : partial_sum (λ k, seq k * C) = λ n, partial_sum seq n * C :=
@@ -1051,7 +1051,7 @@ def partial_sum.right_mul_commute
         induction n with n hn,
             rw partial_sum,
             rw partial_sum,
-            rw has_zero_left_absorb.eq,
+            rw has_zero_mul_is_zero.eq,
             rw partial_sum,
             rw partial_sum,
             rw hn,
@@ -1064,14 +1064,14 @@ def partial_sum.from_mul
     [has_one α]
     [has_mul α]
 
-    [has_zero_left_absorb α]
+    [has_zero_mul_is_zero α]
     [has_left_unit α]
     [has_right_add_distributivity α]
 
     [has_lift_t nat α]
-    [has_same_lifted_zero nat α]
-    [has_same_lifted_one nat α]
-    [has_lift_add_distributivity nat α]
+    [has_lift_zero_same nat α]
+    [has_lift_one_same nat α]
+    [has_lift_add_comm nat α]
 
     (a : α)
     (n : nat)
@@ -1081,14 +1081,14 @@ def partial_sum.from_mul
     begin
         induction n with n hn,
             rw partial_sum,
-            rw has_same_lifted_zero.eq,
-            rw has_zero_left_absorb.eq,
+            rw has_lift_zero_same.eq,
+            rw has_zero_mul_is_zero.eq,
             rw partial_sum,
             rw nat.succ_eq_add_one,
             rw nat.add_comm,
-            rw has_lift_add_distributivity.eq,
+            rw has_lift_add_comm.eq,
             rw has_right_add_distributivity.eq,
-            rw has_same_lifted_one.eq,
+            rw has_lift_one_same.eq,
             rw has_left_unit.eq,
             rw hn,
             rw const,
@@ -1100,14 +1100,14 @@ def partial_sum.from_mul'
     [has_one α]
     [has_mul α]
 
-    [has_zero_right_absorb α]
+    [has_mul_zero_is_zero α]
     [has_right_unit α]
     [has_left_add_distributivity α]
 
     [has_lift_t nat α]
-    [has_same_lifted_zero nat α]
-    [has_same_lifted_one nat α]
-    [has_lift_add_distributivity nat α]
+    [has_lift_zero_same nat α]
+    [has_lift_one_same nat α]
+    [has_lift_add_comm nat α]
 
     (a : α)
     (n : nat)
@@ -1117,14 +1117,14 @@ def partial_sum.from_mul'
     begin
         induction n with n hn,
             rw partial_sum,
-            rw has_same_lifted_zero.eq,
-            rw has_zero_right_absorb.eq,
+            rw has_lift_zero_same.eq,
+            rw has_mul_zero_is_zero.eq,
             rw partial_sum,
             rw nat.succ_eq_add_one,
             rw nat.add_comm,
-            rw has_lift_add_distributivity.eq,
+            rw has_lift_add_comm.eq,
             rw has_left_add_distributivity.eq,
-            rw has_same_lifted_one.eq,
+            rw has_lift_one_same.eq,
             rw has_right_unit.eq,
             rw hn,
             rw const,
@@ -1190,7 +1190,7 @@ def partial_sum.double_monotonicity
 /--
 -/
 def partial_sum.sub_as_translate
-    [has_sub α] [has_sub_cancel_to_zero α] [has_add_sub_assoc α]
+    [has_sub α] [has_sub_self_is_zero α] [has_add_sub_assoc α]
 
     (seq : nat → α)
 
@@ -1201,9 +1201,9 @@ def partial_sum.sub_as_translate
     begin
         induction n with n hn,
             cases m_le_n,
-                refine has_sub_cancel_to_zero.eq _,
+                refine has_sub_self_is_zero.eq _,
             cases m_le_n with _ m_le_n,
-                rw has_sub_cancel_to_zero.eq,
+                rw has_sub_self_is_zero.eq,
                 rw nat.sub_self,
                 rw partial_sum,
                 rw partial_sum,
@@ -1220,7 +1220,7 @@ def partial_sum.sub_as_translate
 def partial_sum.lower_differences.bottom
     [has_sub α]
     [has_add_sub_assoc α]
-    [has_sub_cancel_to_zero α]
+    [has_sub_self_is_zero α]
 
     [preorder α]
     [has_le_add_of_nonneg_of_le α]
@@ -1234,20 +1234,20 @@ def partial_sum.lower_differences.bottom
     begin
         induction n with n hn,
             cases m_le_n,
-                rw has_sub_cancel_to_zero.eq,
+                rw has_sub_self_is_zero.eq,
             cases nat.of_le_succ m_le_n,
                 rw partial_sum,
                 rw has_add_sub_assoc.eq,
                 refine has_le_add_of_nonneg_of_le.le (nonneg _) (hn h),
                 rw ← h,
-                rw has_sub_cancel_to_zero.eq,
+                rw has_sub_self_is_zero.eq,
     end
 
 /--
 -/
 def partial_sum.lower_differences
     [has_sub α]
-    [has_sub_cancel_to_zero α]
+    [has_sub_self_is_zero α]
     [has_add_sub_assoc α]
 
     [preorder α]
@@ -1271,7 +1271,7 @@ def partial_sum.lower_differences
                 rw has_add_sub_assoc.eq,
                 refine has_add_le_add.le (le_refl _) (hn h),
                 rw ← h,
-                rw has_sub_cancel_to_zero.eq,
+                rw has_sub_self_is_zero.eq,
                 refine partial_sum.lower_differences.bottom _ nonneg k_le_m,
     end
 
@@ -1286,7 +1286,7 @@ def shape_sum (seq : nat → α) (φ : nat → nat) (n : nat)
 /--
 -/
 def shape_sum.unfold
-    [has_sub_cancel_to_zero α]
+    [has_sub_self_is_zero α]
     [has_add_sub_assoc α]
     [has_sub_add_sub_cancel α]
 

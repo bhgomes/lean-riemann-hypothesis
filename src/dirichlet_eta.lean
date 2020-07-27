@@ -21,8 +21,8 @@ namespace dirichlet_eta --——————————————————
 /--
 -/
 def term_pair
-    [has_same_lifted_zero ℕ ℝ]
-    [has_lift_lt_preserved ℕ ℝ]
+    [has_lift_zero_same ℕ ℝ]
+    [has_lift_lt_comm ℕ ℝ]
     (s n)
     := riemann_zeta.term ℭ.pow s (2 * n) - riemann_zeta.term ℭ.pow s (2 * n).succ
 
@@ -36,15 +36,15 @@ def riemann_zeta_bound (s)
 /--
 -/
 def riemann_zeta_bound.positive
-    [has_zero_left_absorb ℝ]
+    [has_zero_mul_is_zero ℝ]
     [has_nonneg_mul_nonneg_is_nonneg ℝ]
     [has_lt_add_of_le_of_pos ℝ]
     [has_lt_pos_mul_preserves_right ℝ]
 
-    [has_same_lifted_zero ℕ ℝ]
-    [has_same_lifted_one ℕ ℝ]
-    [has_lift_add_distributivity ℕ ℝ]
-    [has_lift_lt_preserved ℕ ℝ]
+    [has_lift_zero_same ℕ ℝ]
+    [has_lift_one_same ℕ ℝ]
+    [has_lift_add_comm ℕ ℝ]
+    [has_lift_lt_comm ℕ ℝ]
 
     (s)
 
@@ -59,7 +59,7 @@ def riemann_zeta_bound.positive
             := has_lt_pos_mul_preserves_right.lt
                 (ℭ.real_explog.exp_positive _) (nat.lift.succ_pos ℝ _),
 
-        rw has_zero_left_absorb.eq at four_exponentials_are_positive,
+        rw has_zero_mul_is_zero.eq at four_exponentials_are_positive,
 
         refine four_exponentials_are_positive,
     end
@@ -67,15 +67,15 @@ def riemann_zeta_bound.positive
 /--
 -/
 def riemann_zeta_bound.abs_positive
-    [has_zero_left_absorb ℝ]
+    [has_zero_mul_is_zero ℝ]
     [has_nonneg_mul_nonneg_is_nonneg ℝ]
     [has_lt_add_of_le_of_pos ℝ]
     [has_lt_pos_mul_preserves_right ℝ]
 
-    [has_same_lifted_zero ℕ ℝ]
-    [has_same_lifted_one ℕ ℝ]
-    [has_lift_add_distributivity ℕ ℝ]
-    [has_lift_lt_preserved ℕ ℝ]
+    [has_lift_zero_same ℕ ℝ]
+    [has_lift_one_same ℕ ℝ]
+    [has_lift_add_comm ℕ ℝ]
+    [has_lift_lt_comm ℕ ℝ]
 
     (ge_zero_to_abs : Π z, 0 ≤ z → ℭ.abs ↑z = z)
 
@@ -112,20 +112,20 @@ def bounded_by_riemann_zeta
     [has_right_sub_distributivity ℝ]
     [has_right_unit ℝ]
     [has_squared_le_monotonic ℝ]
-    [has_zero_left_absorb ℝ]
-    [has_zero_right_absorb ℝ]
+    [has_zero_mul_is_zero ℝ]
+    [has_mul_zero_is_zero ℝ]
     [has_zero_right_add_cancel ℝ]
     [has_zero_sub_is_neg ℝ]
     [has_mul_pos ℝ]
     [has_inv_pos ℝ]
 
-    [has_lift_add_distributivity nat ℝ]
-    [has_lift_le_preserved nat ℝ]
-    [has_lift_lt_preserved nat ℝ]
-    [has_lift_ne_preserved nat ℝ]
-    [has_lift_sub_distributivity nat ℝ]
-    [has_same_lifted_one nat ℝ]
-    [has_same_lifted_zero nat ℝ]
+    [has_lift_add_comm nat ℝ]
+    [has_lift_le_comm nat ℝ]
+    [has_lift_lt_comm nat ℝ]
+    [has_lift_ne_comm nat ℝ]
+    [has_lift_sub_comm nat ℝ]
+    [has_lift_one_same nat ℝ]
+    [has_lift_zero_same nat ℝ]
 
     [has_add_sub_assoc ℂ]
     [has_inv_mul_left_cancel_self ℂ]
@@ -135,12 +135,12 @@ def bounded_by_riemann_zeta
     [has_right_sub_distributivity ℂ]
     [has_right_unit ℂ]
     [has_sub_add_sub_cancel ℂ]
-    [has_sub_cancel_to_zero ℂ]
-    [has_zero_right_absorb ℂ]
+    [has_sub_self_is_zero ℂ]
+    [has_mul_zero_is_zero ℂ]
     [has_zero_right_add_cancel ℂ]
     [has_zero_sub_is_neg ℂ]
 
-    [has_lift_sub_distributivity ℝ ℂ]
+    [has_lift_sub_comm ℝ ℂ]
 
     (abs_mul        : Π a b, ℭ.abs (a * b) = ℭ.abs (a) * ℭ.abs (b))
     (abs_sub        : Π a b, ℭ.abs (a - b) = ℭ.abs (b - a))
@@ -179,7 +179,7 @@ def bounded_by_riemann_zeta
                 := has_right_inv_pos_lt.lt
                     (nat.lift.succ_pos ℝ _) (nat.lift.zero_lt_one ℝ),
 
-            rw [has_zero_left_absorb.eq, has_left_unit.eq] at ineq,
+            rw [has_zero_mul_is_zero.eq, has_left_unit.eq] at ineq,
 
             refine le_of_lt ineq,
         },
@@ -193,7 +193,7 @@ def bounded_by_riemann_zeta
         rw [Complex.pow, Complex.pow],
         rw ← Complex.exp_homomorphism_inv,
         rw ← has_right_sub_distributivity.eq,
-        rw ← has_lift_sub_distributivity.eq,
+        rw ← has_lift_sub_comm.eq,
 
         rw ← ℭ.real_explog.log_homomorphism_inv
             (nat.lift.succ_pos ℝ _) (nat.lift.succ_pos ℝ _),
@@ -207,7 +207,7 @@ def bounded_by_riemann_zeta
 
         refine le_trans _
             (has_le_pos_mul_preserves_right.le (riemann_zeta_bound.positive _ _)
-            (has_inv_reverses_le.le (le_of_lt (has_lift_lt_preserved.lt
+            (has_inv_reverses_le.le (le_of_lt (has_lift_lt_comm.lt
                 (nat.lt_succ_self _))))),
 
         rw ← mul_inv_add_one_lemma,
@@ -229,13 +229,13 @@ def bounded_by_riemann_zeta
         rw two_is_lifted_two_lemma ℕ ℝ,
         rw one_is_lifted_one_lemma ℕ ℝ,
 
-        refine has_lift_le_preserved.le (le_of_lt (nat.lt_succ_self _)),
+        refine has_lift_le_comm.le (le_of_lt (nat.lt_succ_self _)),
 
         rw remove_abs,
         rw two_is_lifted_two_lemma ℕ ℝ,
 
         refine has_inv_reverses_le.le
-            (has_lift_le_preserved.le (nat.smallest_positive_even _)),
+            (has_lift_le_comm.le (nat.smallest_positive_even _)),
 
         rw remove_abs,
         rw ← has_left_add_distributivity.eq,
@@ -250,7 +250,7 @@ def bounded_by_riemann_zeta
 
         rw two_is_lifted_two_lemma ℕ ℝ,
 
-        refine has_lift_le_preserved.le (le_of_lt (nat.lt_succ_self _)),
+        refine has_lift_le_comm.le (le_of_lt (nat.lt_succ_self _)),
     end
 
 end term_pair --—————————————————————————————————————————————————————————————————————————--
@@ -258,8 +258,8 @@ end term_pair --—————————————————————�
 /--
 -/
 def partial_pairs
-    [has_lift_lt_preserved ℕ ℝ]
-    [has_same_lifted_zero ℕ ℝ]
+    [has_lift_lt_comm ℕ ℝ]
+    [has_lift_zero_same ℕ ℝ]
     (s)
     := partial_sum (term_pair ℭ s)
 
@@ -301,26 +301,26 @@ def partial_pairs.is_cauchy
     [has_right_unit ℝ]
     [has_squared_le_monotonic ℝ]
     [has_sub_add_sub_cancel ℝ]
-    [has_sub_cancel_to_zero ℝ]
+    [has_sub_self_is_zero ℝ]
     [has_sub_ne_zero_of_ne ℝ]
     [has_sub_sub ℝ]
-    [has_zero_left_absorb ℝ]
+    [has_zero_mul_is_zero ℝ]
+    [has_mul_zero_is_zero ℝ]
     [has_zero_left_add_cancel ℝ]
-    [has_zero_right_absorb ℝ]
     [has_zero_right_add_cancel ℝ]
     [has_zero_sub_is_neg ℝ]
     [has_mul_pos ℝ]
     [has_inv_pos ℝ]
     [has_sub_pos ℝ]
 
-    [has_lift_add_distributivity nat ℝ]
-    [has_lift_le_preserved nat ℝ]
-    [has_lift_lt_preserved nat ℝ]
-    [has_lift_mul_distributivity nat ℝ]
-    [has_lift_ne_preserved nat ℝ]
-    [has_lift_sub_distributivity nat ℝ]
-    [has_same_lifted_one nat ℝ]
-    [has_same_lifted_zero nat ℝ]
+    [has_lift_zero_same nat ℝ]
+    [has_lift_one_same nat ℝ]
+    [has_lift_add_comm nat ℝ]
+    [has_lift_mul_comm nat ℝ]
+    [has_lift_sub_comm nat ℝ]
+    [has_lift_le_comm nat ℝ]
+    [has_lift_lt_comm nat ℝ]
+    [has_lift_ne_comm nat ℝ]
 
     [has_add_sub_assoc ℂ]
     [has_inv_mul_left_cancel_self ℂ]
@@ -330,16 +330,16 @@ def partial_pairs.is_cauchy
     [has_right_sub_distributivity ℂ]
     [has_right_unit ℂ]
     [has_sub_add_sub_cancel ℂ]
-    [has_sub_cancel_to_zero ℂ]
-    [has_zero_right_absorb ℂ]
+    [has_sub_self_is_zero ℂ]
+    [has_mul_zero_is_zero ℂ]
     [has_zero_right_add_cancel ℂ]
     [has_zero_sub_is_neg ℂ]
 
-    [has_same_lifted_zero ℝ ℂ]
-    [has_same_lifted_one ℝ ℂ]
-    [has_lift_add_distributivity ℝ ℂ]
-    [has_lift_sub_distributivity ℝ ℂ]
-    [has_lift_mul_distributivity ℝ ℂ]
+    [has_lift_zero_same ℝ ℂ]
+    [has_lift_one_same ℝ ℂ]
+    [has_lift_add_comm ℝ ℂ]
+    [has_lift_sub_comm ℝ ℂ]
+    [has_lift_mul_comm ℝ ℂ]
     [has_lift_inv_comm ℝ ℂ]
 
     (abs_zero abs_one)
@@ -363,26 +363,26 @@ def partial_pairs.is_cauchy
         rw has_zero_right_add_cancel.eq at one_plus_σ_gt_one,
 
         have abs_zeroℝ : ℭ.abs ↑(0 : ℝ) = 0,
-            rw has_same_lifted_zero.eq,
+            rw has_lift_zero_same.eq,
             refine abs_zero,
 
         have abs_oneℝ : ℭ.abs ↑(1 : ℝ) = 1,
-            rw has_same_lifted_one.eq,
+            rw has_lift_one_same.eq,
             refine abs_one,
 
         have abs_addℝ : Π x y : ℝ, ℭ.abs ↑(x + y) ≤ ℭ.abs ↑x + ℭ.abs ↑y,
             intros,
-            rw has_lift_add_distributivity.eq,
+            rw has_lift_add_comm.eq,
             refine abs_add _ _,
 
         have abs_subℝ : Π x y : ℝ, ℭ.abs ↑(x - y) = ℭ.abs ↑(y - x),
             intros,
-            rw [has_lift_sub_distributivity.eq, has_lift_sub_distributivity.eq],
+            rw [has_lift_sub_comm.eq, has_lift_sub_comm.eq],
             refine abs_sub _ _,
 
         have abs_mulℝ : Π x y : ℝ, ℭ.abs ↑(x * y) = ℭ.abs ↑x * ℭ.abs ↑y,
             intros,
-            rw has_lift_mul_distributivity.eq,
+            rw has_lift_mul_comm.eq,
             refine abs_mul _ _,
 
         have abs_invℝ : Π x : ℝ, ℭ.abs ↑(x⁻¹) = (ℭ.abs ↑x)⁻¹,

@@ -93,14 +93,14 @@ def pow_nonzero (a apos x)
 -/
 def pow_neg_exponent_inverts
     [has_left_sub_distributivity ℂ]
-    [has_zero_right_absorb ℂ]
+    [has_mul_zero_is_zero ℂ]
     [has_left_unit ℂ]
     (a apos x)
     : ℭ.pow a apos (0 - x) = (ℭ.pow a apos x)⁻¹ :=
     begin
         rw pow,
         rw has_left_sub_distributivity.eq,
-        rw has_zero_right_absorb.eq,
+        rw has_mul_zero_is_zero.eq,
         rw exp_homomorphism_inv,
         rw exp_homomorphism_zero,
         rw has_left_unit.eq,
@@ -140,7 +140,7 @@ def one_minus_pow_bound
 
     [has_sub_add_sub_cancel ℂ]
     [has_add_sub_assoc ℂ]
-    [has_sub_cancel_to_zero ℂ]
+    [has_sub_self_is_zero ℂ]
     [has_zero_right_add_cancel ℂ]
 
     [has_zero_right_add_cancel ℝ]
@@ -161,7 +161,7 @@ def one_minus_pow_bound
         refine le_trans (abs_triangle _ _) _,
 
         rw has_add_sub_assoc.eq,
-        rw has_sub_cancel_to_zero.eq,
+        rw has_sub_self_is_zero.eq,
         rw has_zero_right_add_cancel.eq,
         rw abs_mul,
         rw has_left_add_distributivity.eq,

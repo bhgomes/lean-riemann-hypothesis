@@ -182,13 +182,13 @@ def pow_domain_irrel
 /--
 -/
 def pow_homomorphism_zero
-    [has_zero_right_absorb β]
+    [has_mul_zero_is_zero β]
     (ℯ : ExpLog α β)
     (a apos)
     : ℯ.pow a apos 0 = 1 :=
     begin
         rw pow,
-        rw has_zero_right_absorb.eq,
+        rw has_mul_zero_is_zero.eq,
         rw exp_homomorphism_zero,
     end
 
@@ -254,14 +254,14 @@ def pow_id_at_one
 -/
 def pow_homomorphism_one
     [has_zero_lt_one α]
-    [has_zero_left_absorb β]
+    [has_zero_mul_is_zero β]
     (ℯ : ExpLog α β)
     (b)
     : ℯ.pow 1 has_zero_lt_one.lt b = 1 :=
     begin
         rw pow,
         rw log_homomorphism_zero,
-        rw has_zero_left_absorb.eq,
+        rw has_zero_mul_is_zero.eq,
         rw exp_homomorphism_zero,
     end
 
@@ -278,7 +278,7 @@ def pow_positivity
 def pow_neg_exponent_inverts
     [has_one β]
     [has_left_sub_distributivity β]
-    [has_zero_right_absorb β]
+    [has_mul_zero_is_zero β]
     [has_left_unit α]
     (ℯ : ExpLog α β)
     (a apos b)
@@ -296,7 +296,7 @@ def pow_homomorphism_inv_from_neg
     [has_neg β]
     [has_zero_sub_is_neg β]
     [has_left_sub_distributivity β]
-    [has_zero_right_absorb β]
+    [has_mul_zero_is_zero β]
     [has_left_unit α]
     (ℯ : ExpLog α β)
     (a apos x y)
@@ -314,17 +314,17 @@ def pow_succ_reduce
     [has_one β]
     [has_right_unit β]
     [has_left_add_distributivity β]
-    [has_lift_add_distributivity nat β]
-    [has_same_lifted_one nat β]
+    [has_lift_add_comm nat β]
+    [has_lift_one_same nat β]
     (ℯ : ExpLog α β)
     (a apos)
     (n : nat)
     : ℯ.pow a apos ↑n.succ = ℯ.pow a apos ↑n * a :=
     begin
         rw ← nat.add_one,
-        rw has_lift_add_distributivity.eq,
+        rw has_lift_add_comm.eq,
         rw pow_homomorphism,
-        rw has_same_lifted_one.eq,
+        rw has_lift_one_same.eq,
         rw pow_id_at_one,
     end
 
@@ -358,12 +358,12 @@ def nat_pow
 def nat_pow_to_nat_power
     [has_one β]
     [has_right_unit β]
-    [has_zero_right_absorb β]
+    [has_mul_zero_is_zero β]
     [has_left_add_distributivity β]
     [has_lift_t nat β]
-    [has_same_lifted_zero nat β]
-    [has_same_lifted_one nat β]
-    [has_lift_add_distributivity nat β]
+    [has_lift_zero_same nat β]
+    [has_lift_one_same nat β]
+    [has_lift_add_comm nat β]
     (ℯ : ExpLog α β)
     (a : α) (apos : 0 < a)
     : nat.power a = ℯ.nat_pow a apos :=
@@ -373,14 +373,14 @@ def nat_pow_to_nat_power
         induction n with n hn,
             rw nat.power,
             rw nat_pow,
-            rw has_same_lifted_zero.eq,
+            rw has_lift_zero_same.eq,
             rw pow_homomorphism_zero,
             rw nat.power,
             rw nat.succ_eq_add_one,
             rw nat_pow,
-            rw has_lift_add_distributivity.eq,
+            rw has_lift_add_comm.eq,
             rw pow_homomorphism,
-            rw has_same_lifted_one.eq,
+            rw has_lift_one_same.eq,
             rw pow_id_at_one,
             rw hn,
             rw nat_pow,

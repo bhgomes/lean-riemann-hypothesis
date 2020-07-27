@@ -108,7 +108,7 @@ variables [has_lt α] [has_mul α] [has_inv α]
 
 section closed_left_mul --———————————————————————————————————————————————————————————————--
 variables [has_left_sub_distributivity α] [has_left_inv_pos_lt α]
-          [has_zero_right_absorb α] [has_right_mul_inv_lt_pos α]
+          [has_mul_zero_is_zero α] [has_right_mul_inv_lt_pos α]
 
 /--
 -/
@@ -127,7 +127,7 @@ def closed.sequence_left_mul
 
         let division := has_left_inv_pos_lt.lt absC_pos εpos,
 
-        rw has_zero_right_absorb.eq at division,
+        rw has_mul_zero_is_zero.eq at division,
 
         let cauchy := cauchy_condition _ division,
 
@@ -162,7 +162,7 @@ end closed_left_mul --———————————————————�
 
 section closed_right_mul --——————————————————————————————————————————————————————————————--
 variables [has_right_sub_distributivity α] [has_right_inv_pos_lt α]
-          [has_zero_left_absorb α] [has_left_mul_inv_lt_pos α]
+          [has_zero_mul_is_zero α] [has_left_mul_inv_lt_pos α]
 
 /--
 -/
@@ -181,7 +181,7 @@ def closed.sequence_right_mul
 
         let division := has_right_inv_pos_lt.lt absC_pos εpos,
 
-        rw has_zero_left_absorb.eq at division,
+        rw has_zero_mul_is_zero.eq at division,
 
         let cauchy := cauchy_condition _ division,
 
@@ -218,7 +218,7 @@ end closed_mul --—————————————————————
 
 --———————————————————————————————————————————————————————————————————————————————————————--
 variables [has_add α]
-          [has_sub_cancel_to_zero α] [has_add_sub_assoc α]
+          [has_sub_self_is_zero α] [has_add_sub_assoc α]
 
 /--
 -/
@@ -253,7 +253,7 @@ section comparison --———————————————————�
 variables [has_add_le_add α]
 
 variables [has_zero β] [has_add β] [has_sub β]
-          [has_add_sub_assoc β] [has_sub_cancel_to_zero β]
+          [has_add_sub_assoc β] [has_sub_self_is_zero β]
 
 variables (abs            : α → α)
           (ge_zero_to_abs : Π z, 0 ≤ z → abs z = z)
@@ -419,7 +419,7 @@ end is_cauchy --—————————————————————�
 
 namespace condensation --————————————————————————————————————————————————————————————————--
 variables [preorder α] [has_zero α] [has_one α] [has_sub α] [has_add α] [has_mul α]
-          [has_sub_cancel_to_zero α] [has_add_sub_assoc α]
+          [has_sub_self_is_zero α] [has_add_sub_assoc α]
           [has_sub_add_sub_cancel α] [has_add_nonneg α] [has_add_le_add α]
           [has_le_add_of_nonneg_of_le α]
 
@@ -471,8 +471,8 @@ def shape_sum_comparison
     end
 
 --———————————————————————————————————————————————————————————————————————————————————————--
-variables [has_lift_t nat α] [has_same_lifted_zero nat α] [has_same_lifted_one nat α]
-          [has_lift_add_distributivity nat α] [has_zero_left_absorb α] [has_left_unit α]
+variables [has_lift_t nat α] [has_lift_zero_same nat α] [has_lift_one_same nat α]
+          [has_lift_add_comm nat α] [has_zero_mul_is_zero α] [has_left_unit α]
           [has_right_add_distributivity α]
 
 variables (abs            : α → α)
@@ -562,7 +562,7 @@ namespace geometric --———————————————————�
 variables [has_zero α] [has_one α] [has_add α] [has_mul α] [has_sub α] [has_inv α]
           [has_mul_assoc α] [has_zero_right_add_cancel α] [has_right_unit α]
           [has_sub_ne_zero_of_ne α] [has_right_sub_distributivity α]
-          [has_sub_cancel_to_zero α] [has_inv_mul_right_cancel_self α]
+          [has_sub_self_is_zero α] [has_inv_mul_right_cancel_self α]
           [has_left_sub_distributivity α] [has_add_sub_exchange α]
           [has_right_add_distributivity α]
 
@@ -583,7 +583,7 @@ def series.formula
             rw partial_sum,
             rw nat.power,
             rw has_right_sub_distributivity.eq,
-            rw has_sub_cancel_to_zero.eq,
+            rw has_sub_self_is_zero.eq,
 
             rw partial_sum,
             rw nat.power,
@@ -596,7 +596,7 @@ def series.formula
             rw has_left_sub_distributivity.eq,
             rw has_right_unit.eq,
             rw has_add_sub_exchange.eq,
-            rw has_sub_cancel_to_zero.eq,
+            rw has_sub_self_is_zero.eq,
             rw has_zero_right_add_cancel.eq,
             rw has_mul_assoc.eq,
             rw has_inv_mul_right_cancel_self.eq _
@@ -613,16 +613,16 @@ section series_is_cauchy --—————————————————�
 -/
 def series.is_cauchy
     [has_lift_t nat α]
-    [has_lift_add_distributivity nat α]
-    [has_same_lifted_zero nat α]
-    [has_same_lifted_one nat α]
+    [has_lift_add_comm nat α]
+    [has_lift_zero_same nat α]
+    [has_lift_one_same nat α]
 
     [preorder α]
     [has_add_lt_add α]
     [has_left_add_distributivity α]
     [has_sub_add_sub_cancel α]
     [has_sub_sub α]
-    [has_zero_right_absorb α]
+    [has_mul_zero_is_zero α]
     [has_left_unit α]
     [has_inv_right_mul_lt_pos α]
     [has_left_mul_inv_lt_neg α]
@@ -677,7 +677,7 @@ def series.is_cauchy
         rw has_right_sub_distributivity.eq,
         rw has_left_unit.eq,
         rw has_sub_sub.eq,
-        rw has_sub_cancel_to_zero.eq,
+        rw has_sub_self_is_zero.eq,
         rw has_zero_left_add_cancel.eq,
         rw abs_mul,
         rw abs_inv,
