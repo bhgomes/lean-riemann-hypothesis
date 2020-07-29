@@ -35,25 +35,21 @@ section algebra --————————————————————�
 variables (α) (β)
 
 /--
-provable from DD axioms
 -/
 class has_left_add_distributivity [has_add α] [has_mul α]
     := (eq : Π x y z : α, x * (y + z) = x * y + x * z)
 
 /--
-provable from DD axioms
 -/
 class has_right_add_distributivity [has_add α] [has_mul α]
     := (eq : Π x y z : α, (y + z) * x = y * x + z * x)
 
 /--
-AXIOM
 -/
 class has_left_sub_distributivity [has_sub α] [has_mul α]
     := (eq : Π x y z : α, x * (y - z) = x * y - x * z)
 
 /--
-AXIOM
 -/
 class has_right_sub_distributivity [has_sub α] [has_mul α]
     := (eq : Π x y z : α, (y - z) * x = y * x - z * x)
@@ -79,13 +75,11 @@ class has_lift_inv_comm [has_lift_t α β] [has_inv α] [has_inv β]
     := (eq : Π a : α, (↑(a⁻¹) : β) = (↑a)⁻¹)
 
 /--
-AXIOM
 -/
 class has_right_unit [has_one α] [has_mul α]
     := (eq : Π a : α, a * 1 = a)
 
 /--
-AXIOM
 -/
 class has_left_unit [has_one α] [has_mul α]
     := (eq : Π a : α, 1 * a = a)
@@ -101,7 +95,6 @@ class has_add_lt_add [has_lt α] [has_add α]
     := (lt : Π {a b c d : α}, a < b → c < d → a + c < b + d)
 
 /--
--- try to remove and use has_lt_add_of_le_of_pos instead
 -/
 class has_le_add_of_nonneg_of_le [has_le α] [has_zero α] [has_add α]
     := (le : Π {a b c : α}, 0 ≤ a → b ≤ c → b ≤ a + c)
@@ -112,7 +105,6 @@ class has_lt_add_of_le_of_pos [has_le α] [has_lt α] [has_zero α] [has_add α]
     := (lt : Π {a b c : α}, 0 < a → b ≤ c → b < a + c)
 
 /--
--- provable from has_add_le_add ...
 -/
 class has_add_nonneg [has_le α] [has_zero α] [has_add α]
     := (le : Π {a b : α}, 0 ≤ a → 0 ≤ b → 0 ≤ a + b)
@@ -123,7 +115,6 @@ class has_zero_mul_is_zero [has_zero α] [has_mul α]
     := (eq : Π a : α, 0 * a = 0)
 
 /--
-AXIOM
 -/
 class has_mul_zero_is_zero [has_zero α] [has_mul α]
     := (eq : Π a : α, a * 0 = 0)
@@ -139,25 +130,21 @@ class has_lift_one_same [has_lift_t α β] [has_one α] [has_one β]
     := (eq : ↑(1 : α) = (1 : β))
 
 /--
-provable from DD axioms
 -/
 class has_zero_right_add_cancel [has_zero α] [has_add α]
     := (eq : Π a : α, a + 0 = a)
 
 /--
-provable from has_double_sub_cancel
 -/
 class has_zero_left_add_cancel [has_zero α] [has_add α]
     := (eq : Π a : α, 0 + a = a)
 
 /--
-AXIOM
 -/
 class has_sub_self_is_zero [has_zero α] [has_sub α]
     := (eq : Π a : α, a - a = 0)
 
 /--
-AXIOM
 -/
 class has_mul_assoc [has_mul α]
     := (eq : Π a b c : α, (a * b) * c = a * (b * c))
@@ -223,7 +210,6 @@ class has_double_sub_cancel [has_sub α]
     := (eq : Π a b : α, a - (a - b) = b)
 
 /--
-AXIOM
 -/
 class has_inv_mul_right_cancel_self [has_zero α] [has_one α] [has_inv α] [has_mul α]
     := (eq : Π a : α, a ≠ 0 → a * a⁻¹ = 1)
@@ -239,7 +225,6 @@ class has_add_sub_exchange [has_add α] [has_sub α]
     := (eq : Π a b c d : α, (a - b) + (c - d) = (c - b) + (a - d))
 
 /--
-DEFINITION ("axiom")
 -/
 class has_zero_sub_is_neg [has_zero α] [has_neg α] [has_sub α]
     := (eq : Π a : α, 0 - a = -a)
@@ -305,7 +290,6 @@ class has_sub_sub [has_add α] [has_sub α]
     := (eq : Π a b c : α, a - (b - c) = (a - b) + c)
 
 /--
-use reverse of has_lt_sub_neg?
 -/
 class has_add_left_lt [has_lt α] [has_add α]
     := (lt : Π a b c : α, a < b → c + a < c + b)
@@ -331,13 +315,11 @@ class has_inv_pos [has_lt α] [has_zero α] [has_inv α]
     := (lt : Π {a : α}, 0 < a → 0 < a⁻¹)
 
 /--
-AXIOM
 -/
 class has_inv_reverses_le [has_le α] [has_inv α]
     := (le : Π {a b : α}, a ≤ b → b⁻¹ ≤ a⁻¹)
 
 /--
-AXIOM
 -/
 class has_inv_reverses_lt [has_lt α] [has_inv α]
     := (lt : Π {a b : α}, a < b → b⁻¹ < a⁻¹)
@@ -412,7 +394,6 @@ def inv_sub_inv_lemma'
     end
 
 /--
-move to use location
 -/
 def mul_inv_add_one_lemma
     [has_lift_t nat α]
