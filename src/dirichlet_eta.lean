@@ -11,12 +11,14 @@ import .riemann_zeta
 /-!
 -/
 
---———————————————————————————————————————————————————————————————————————————————————————--
+namespace riemann_hypothesis --——————————————————————————————————————————————————————————--
 variables {ℂ : Type*} {ℝ : Type*}
           [has_lift_t nat ℝ] [has_lift_t ℝ ℂ] [preorder ℝ] [Algebra ℝ] [Algebra ℂ]
           (ℭ : Complex ℂ ℝ)
 
 namespace dirichlet_eta --———————————————————————————————————————————————————————————————--
+
+open algebra
 
 /--
 -/
@@ -386,3 +388,4 @@ def partial_pairs.is_cauchy
     end
 
 end dirichlet_eta --—————————————————————————————————————————————————————————————————————--
+end riemann_hypothesis --————————————————————————————————————————————————————————————————--

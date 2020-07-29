@@ -10,10 +10,13 @@ import .cauchy
 /-!
 -/
 
+namespace riemann_hypothesis --——————————————————————————————————————————————————————————--
 namespace riemann_zeta --————————————————————————————————————————————————————————————————--
 variables {ℝ : Type*}
           [has_lift_t nat ℝ] [preorder ℝ] [has_zero ℝ] [has_one ℝ]
           [has_neg ℝ] [has_add ℝ] [has_sub ℝ] [has_mul ℝ] [has_inv ℝ]
+
+open algebra
 
 /--
 -/
@@ -242,3 +245,4 @@ def partial.on_reals.is_cauchy
     end
 
 end riemann_zeta --——————————————————————————————————————————————————————————————————————--
+end riemann_hypothesis --————————————————————————————————————————————————————————————————--

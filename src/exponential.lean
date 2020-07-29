@@ -10,7 +10,7 @@ import .basic
 /-!
 -/
 
---———————————————————————————————————————————————————————————————————————————————————————--
+namespace riemann_hypothesis --——————————————————————————————————————————————————————————--
 variables (α : Type*) (β : Type*)
 variables [has_lt α] [has_zero α] [has_one α] [has_mul α] [has_inv α]
           [has_lt β] [has_zero β] [has_add β] [has_sub β]
@@ -32,6 +32,8 @@ structure ExpLog
 
 namespace ExpLog --——————————————————————————————————————————————————————————————————————--
 variables {α β}
+
+open algebra
 
 /--
 -/
@@ -387,3 +389,4 @@ def nat_pow_to_nat_power
     end
 
 end ExpLog --————————————————————————————————————————————————————————————————————————————--
+end riemann_hypothesis --————————————————————————————————————————————————————————————————--

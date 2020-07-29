@@ -8,7 +8,7 @@
 /-!
 -/
 
---———————————————————————————————————————————————————————————————————————————————————————--
+namespace riemann_hypothesis --——————————————————————————————————————————————————————————--
 variables {α : Type*} {β : Type*}
 
 /--
@@ -31,7 +31,7 @@ instance pointwise.has_zero [has_zero β] : has_zero (α → β)
 
 end pointwise_classes --—————————————————————————————————————————————————————————————————--
 
-section algebra --———————————————————————————————————————————————————————————————————————--
+namespace algebra --—————————————————————————————————————————————————————————————————————--
 variables (α) (β)
 
 /--
@@ -621,12 +621,14 @@ end lifted_lemmas --————————————————————
 end lemmas --————————————————————————————————————————————————————————————————————————————--
 end algebra --———————————————————————————————————————————————————————————————————————————--
 
+open algebra
+
 namespace nat --—————————————————————————————————————————————————————————————————————————--
 
 /--
 -/
 def of_le_succ {n m : nat} (n_le_m_succ : n ≤ m.succ) : n ≤ m ∨ n = m.succ
-    := (lt_or_eq_of_le n_le_m_succ).imp le_of_lt_succ id
+    := (lt_or_eq_of_le n_le_m_succ).imp nat.le_of_lt_succ id
 
 /--
 -/
@@ -683,8 +685,8 @@ def sub_mono_left_strict {x y z : nat} (z_le_x : z ≤ x) (x_lt_y : x < y)
     : x - z < y - z :=
     begin
         refine @nat.lt_of_add_lt_add_left z _ _ _,
-        rw add_sub_of_le (le_trans z_le_x (le_of_lt x_lt_y)),
-        rw add_sub_of_le z_le_x,
+        rw nat.add_sub_of_le (le_trans z_le_x (le_of_lt x_lt_y)),
+        rw nat.add_sub_of_le z_le_x,
         refine x_lt_y,
 end
 
@@ -702,7 +704,7 @@ def pow_two_ge_one (n : nat) : 1 ≤ 2 ^ n :=
     begin
         induction n with n hn,
             refine le_refl _,
-            refine le_trans hn (le_add_left _ _),
+            refine le_trans hn (nat.le_add_left _ _),
     end
 
 /--
@@ -1339,3 +1341,5 @@ def triangle_equality
     := nonneg_to_abs _ (partial_sum.preserve_nonneg _ nonneg _)
 
 end absolute_value --————————————————————————————————————————————————————————————————————--
+
+end riemann_hypothesis --————————————————————————————————————————————————————————————————--
