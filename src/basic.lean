@@ -787,7 +787,7 @@ def succ_pos
     (n : nat)
     : 0 < (↑n.succ : α) :=
     begin
-        rw zero_is_lifted_zero_lemma ℕ α,
+        rw zero_is_lifted_zero_lemma nat α,
         refine has_lift_lt_comm.lt (nat.succ_pos _),
     end
 

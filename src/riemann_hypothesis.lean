@@ -18,7 +18,7 @@ variables {ℂ : Type*} {ℝ : Type*}
 /--
 -/
 def riemann_hypothesis
-    [has_lift_zero_same ℕ ℝ]
-    [has_lift_lt_comm ℕ ℝ]
+    [has_lift_zero_same nat ℝ]
+    [has_lift_lt_comm nat ℝ]
     (s) (σpos : 0 < ℭ.real_part s)
     := is_convergent ℭ.abs (dirichlet_eta.partial_pairs ℭ s) 0 → ℭ.real_part s = 2⁻¹

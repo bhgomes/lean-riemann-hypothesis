@@ -21,8 +21,8 @@ namespace dirichlet_eta --——————————————————
 /--
 -/
 def term_pair
-    [has_lift_zero_same ℕ ℝ]
-    [has_lift_lt_comm ℕ ℝ]
+    [has_lift_zero_same nat ℝ]
+    [has_lift_lt_comm nat ℝ]
     (s n)
     := riemann_zeta.term ℭ.pow s (2 * n) - riemann_zeta.term ℭ.pow s (2 * n).succ
 
@@ -36,8 +36,8 @@ def riemann_zeta_bound (s)
 namespace riemann_zeta_bound --——————————————————————————————————————————————————————————--
 variables [has_zero_mul_is_zero ℝ] [has_nonneg_mul_nonneg_is_nonneg ℝ]
           [has_lt_add_of_le_of_pos ℝ] [has_lt_pos_mul_preserves_right ℝ]
-          [has_lift_zero_same ℕ ℝ] [has_lift_one_same ℕ ℝ]
-          [has_lift_add_comm ℕ ℝ] [has_lift_lt_comm ℕ ℝ]
+          [has_lift_zero_same nat ℝ] [has_lift_one_same nat ℝ]
+          [has_lift_add_comm nat ℝ] [has_lift_lt_comm nat ℝ]
 
 /--
 -/
@@ -203,17 +203,17 @@ def bounded_by_riemann_zeta
 
         refine le_trans (Complex.one_minus_pow_bound _ _ _ abs_mul abs_add _ _ _ _) _,
 
-        rw two_is_lifted_two_lemma ℕ ℝ,
+        rw two_is_lifted_two_lemma nat ℝ,
 
         refine nat.lift.succ_pos ℝ _,
 
-        rw two_is_lifted_two_lemma ℕ ℝ,
-        rw one_is_lifted_one_lemma ℕ ℝ,
+        rw two_is_lifted_two_lemma nat ℝ,
+        rw one_is_lifted_one_lemma nat ℝ,
 
         refine has_lift_le_comm.le (le_of_lt (nat.lt_succ_self _)),
 
         rw remove_abs,
-        rw two_is_lifted_two_lemma ℕ ℝ,
+        rw two_is_lifted_two_lemma nat ℝ,
 
         refine has_inv_reverses_le.le
             (has_lift_le_comm.le (nat.smallest_positive_even _)),
@@ -221,7 +221,7 @@ def bounded_by_riemann_zeta
         rw remove_abs,
         rw ← has_left_add_distributivity.eq,
 
-        rw four_is_lifted_four_lemma ℕ ℝ,
+        rw four_is_lifted_four_lemma nat ℝ,
         rw ← two_mul_lemma,
 
         refine has_le_nonneg_mul_preserves_left.le
@@ -229,7 +229,7 @@ def bounded_by_riemann_zeta
             (has_add_le_add.le
                 (le_refl _) (has_le_nonneg_mul_preserves_right.le (ℭ.abs_nonneg _) _)),
 
-        rw two_is_lifted_two_lemma ℕ ℝ,
+        rw two_is_lifted_two_lemma nat ℝ,
 
         refine has_lift_le_comm.le (le_of_lt (nat.lt_succ_self _)),
     end
@@ -239,8 +239,8 @@ end term_pair --—————————————————————�
 /--
 -/
 def partial_pairs
-    [has_lift_lt_comm ℕ ℝ]
-    [has_lift_zero_same ℕ ℝ]
+    [has_lift_lt_comm nat ℝ]
+    [has_lift_zero_same nat ℝ]
     (s)
     := partial_sum (term_pair ℭ s)
 

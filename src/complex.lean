@@ -119,7 +119,7 @@ local notation `|` z `|` := ℭ.abs z
 /--
 -/
 def one_minus_pow_bound
-    [has_lift_t ℕ ℝ]
+    [has_lift_t nat ℝ]
 
     [has_add_le_add ℝ]
 

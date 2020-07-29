@@ -45,8 +45,8 @@ def on_reals
 /--
 -/
 def on_reals.nonneg
-    [has_lift_zero_same ℕ ℝ]
-    [has_lift_lt_comm ℕ ℝ]
+    [has_lift_zero_same nat ℝ]
+    [has_lift_lt_comm nat ℝ]
     (ℯ : ExpLog ℝ ℝ)
     (σ n)
     : 0 ≤ on_reals ℯ σ n
@@ -62,7 +62,7 @@ def on_reals.non_increasing
     [has_lt_pos_mul_preserves_right ℝ]
     [has_zero_sub_is_neg ℝ]
     [has_lift_lt_comm nat ℝ]
-    [has_lift_zero_same ℕ ℝ]
+    [has_lift_zero_same nat ℝ]
     (ℯ : ExpLog ℝ ℝ)
     (σ σpos)
     : non_increasing (on_reals ℯ σ) :=
@@ -114,7 +114,7 @@ def on_reals.rewrite.pow_reduction
         have lifted_pow2_pos : Π k : nat, 0 < (↑(2 ^ k) : ℝ),
             intros k,
             refine (lt_of_lt_of_le (nat.lift.zero_lt_one ℝ) _),
-            rw one_is_lifted_one_lemma ℕ ℝ,
+            rw one_is_lifted_one_lemma nat ℝ,
             refine has_lift_le_comm.le (nat.pow_two_ge_one _),
 
         rw [on_reals, term],
@@ -139,7 +139,7 @@ def on_reals.rewrite.pow_reduction
                 (ℯ.pow_positivity _ (nat.lift.succ_pos ℝ _) _),
 
             have scaled_pow_ineq : 0 < (↑(2 ^ n) * ↑2 : ℝ),
-                rw zero_is_lifted_zero_lemma ℕ ℝ,
+                rw zero_is_lifted_zero_lemma nat ℝ,
                 rw ← has_lift_mul_comm.eq,
                 rw ← nat.pow_succ,
                 refine has_lift_lt_comm.lt
@@ -190,7 +190,7 @@ def partial.on_reals.is_cauchy
     [has_lift_mul_comm nat ℝ]
     [has_lift_add_comm nat ℝ]
     [has_lift_lt_comm nat ℝ]
-    [has_lift_le_comm ℕ ℝ]
+    [has_lift_le_comm nat ℝ]
 
     [has_sub_add_sub_cancel ℝ]
     [has_sub_self_is_zero ℝ]
