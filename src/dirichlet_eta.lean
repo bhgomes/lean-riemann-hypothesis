@@ -33,23 +33,16 @@ namespace term_pair --———————————————————�
 def riemann_zeta_bound (s)
     := ↑4 * ℭ.real_exp (ℭ.abs s) + ↑3 * ℭ.abs s
 
+namespace riemann_zeta_bound --——————————————————————————————————————————————————————————--
+variables [has_zero_mul_is_zero ℝ] [has_nonneg_mul_nonneg_is_nonneg ℝ]
+          [has_lt_add_of_le_of_pos ℝ] [has_lt_pos_mul_preserves_right ℝ]
+          [has_lift_zero_same ℕ ℝ] [has_lift_one_same ℕ ℝ]
+          [has_lift_add_comm ℕ ℝ] [has_lift_lt_comm ℕ ℝ]
+
 /--
 -/
-def riemann_zeta_bound.positive
-    [has_zero_mul_is_zero ℝ]
-    [has_nonneg_mul_nonneg_is_nonneg ℝ]
-    [has_lt_add_of_le_of_pos ℝ]
-    [has_lt_pos_mul_preserves_right ℝ]
-
-    [has_lift_zero_same ℕ ℝ]
-    [has_lift_one_same ℕ ℝ]
-    [has_lift_add_comm ℕ ℝ]
-    [has_lift_lt_comm ℕ ℝ]
-
-    (s)
-
+def positive (s)
     : 0 < riemann_zeta_bound ℭ s :=
-
     begin
         refine has_lt_add_of_le_of_pos.lt _
             (has_nonneg_mul_nonneg_is_nonneg.le
@@ -66,33 +59,21 @@ def riemann_zeta_bound.positive
 
 /--
 -/
-def riemann_zeta_bound.abs_positive
-    [has_zero_mul_is_zero ℝ]
-    [has_nonneg_mul_nonneg_is_nonneg ℝ]
-    [has_lt_add_of_le_of_pos ℝ]
-    [has_lt_pos_mul_preserves_right ℝ]
-
-    [has_lift_zero_same ℕ ℝ]
-    [has_lift_one_same ℕ ℝ]
-    [has_lift_add_comm ℕ ℝ]
-    [has_lift_lt_comm ℕ ℝ]
-
+def abs_positive
     (ge_zero_to_abs : Π z, 0 ≤ z → ℭ.abs ↑z = z)
-
     (s)
-
-    : 0 < ℭ.abs ↑(riemann_zeta_bound ℭ s)
-
-    := begin
-        rw ge_zero_to_abs _ (le_of_lt (riemann_zeta_bound.positive ℭ _)),
-        refine riemann_zeta_bound.positive ℭ _,
+    : 0 < ℭ.abs ↑(riemann_zeta_bound ℭ s) :=
+    begin
+        rw ge_zero_to_abs _ (le_of_lt (positive ℭ _)),
+        refine positive ℭ _,
     end
+
+end riemann_zeta_bound --————————————————————————————————————————————————————————————————--
 
 /--
 -/
 def bounded_by_riemann_zeta
     [has_add_le_add ℝ]
-    [has_inv_mul_left_cancel_self ℝ]
     [has_inv_mul_reverse ℝ]
     [has_inv_mul_right_cancel_self ℝ]
     [has_inv_reverses_le ℝ]
