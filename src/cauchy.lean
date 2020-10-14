@@ -1,7 +1,7 @@
 /- ------------------------------------------------------------------------- -|
 | @project: riemann_hypothesis                                                |
 | @file:    cauchy.lean                                                       |
-| @author:  Brandon H. Gomes                                                  |
+| @authors: Brandon H. Gomes, Alex Kontorovich                                |
 | @affil:   Rutgers University                                                |
 |- ------------------------------------------------------------------------- -/
 

@@ -1,7 +1,7 @@
 /- ------------------------------------------------------------------------- -|
 | @project: riemann_hypothesis                                                |
 | @file:    exponential.lean                                                  |
-| @author:  Brandon H. Gomes                                                  |
+| @authors: Brandon H. Gomes, Alex Kontorovich                                |
 | @affil:   Rutgers University                                                |
 |- ------------------------------------------------------------------------- -/
 
