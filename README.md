@@ -10,7 +10,7 @@ The Riemann Hypothesis is formalized by assuming some algebraic properties of th
 (Re s ∈ (0,1)) ∧ (eta s = 0) → (Re s = 1/2)
 ```
 
-We also include the file, `mathlib/impl.lean`, which is a witness that the axioms can be proved using [`mathlib`](https://github.com/leanprover-community/mathlib).
+We also include the file, [`mathlib/impl.lean`](src/mathlib/impl.lean), which is a witness that the axioms can be proved using [`mathlib`](https://github.com/leanprover-community/mathlib).
 
 ## Acknowledgements
 
