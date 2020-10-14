@@ -1,5 +1,5 @@
 /- ------------------------------------------------------------------------- -|
-| @project: riemann_hypothesis_mathlib                                        |
+| @project: riemann_hypothesis/mathlib                                        |
 | @file:    mathlib/impl.lean                                                 |
 | @authors: Brandon H. Gomes, Alex Kontorovich                                |
 | @affil:   Rutgers University                                                |
