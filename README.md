@@ -1,5 +1,7 @@
 # Riemann Hypothesis in Lean
 
+[![DOI](https://zenodo.org/badge/275204877.svg)](https://zenodo.org/badge/latestdoi/275204877)
+
 _by Brandon H. Gomes and Alex Kontorovich through the Department of Mathematics, Rutgers University_
 
 ## Formalization
